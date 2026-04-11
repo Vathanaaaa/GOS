@@ -858,7 +858,7 @@ Watch PUC,Self-Improvement,Mindset & Habits,Daily,High,2026-04-07,12:00,1,,25 mi
 
 <script>
 const TODAY = new Date(); TODAY.setHours(0,0,0,0);
-const TODAYSTR = TODAY.toISOString().split('T')[0];
+const TODAYSTR = TODAY.getFullYear()+'-'+String(TODAY.getMonth()+1).padStart(2,'0')+'-'+String(TODAY.getDate()).padStart(2,'0');
 let calYear = TODAY.getFullYear(), calMonth = TODAY.getMonth();
 let wzView = 'list';
 let masterWzFilter = 'all';
