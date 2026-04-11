@@ -258,9 +258,9 @@ body{font-family:var(--font-body);background:var(--bg1);color:var(--tx0);min-hei
 /* CALENDAR */
 .cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
 .cal-month{font-family:var(--font-head);font-size:15px;font-weight:600;}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;}
 .cal-day-hd{font-size:10px;color:var(--tx2);text-align:center;padding:4px 0;font-family:var(--font-mono);}
-.cal-day{background:var(--bg0);border:1px solid var(--border);border-radius:var(--radius);min-height:76px;padding:5px;cursor:pointer;transition:all 0.12s;}
+.cal-day{background:var(--bg0);border:1px solid var(--border);border-radius:var(--radius);min-height:76px;padding:5px;cursor:pointer;transition:all 0.12s;overflow:hidden;min-width:0;}
 .cal-day:hover{border-color:var(--border2);background:var(--bg1);}
 .cal-day.today{border-color:var(--blue);border-width:1.5px;}
 .cal-day.other-month{opacity:0.3;}
@@ -463,7 +463,7 @@ body{font-family:var(--font-body);background:var(--bg1);color:var(--tx0);min-hei
 .status-dot-done{background:var(--green);}
 .status-dot-todo{background:var(--bg3);border:1.5px solid var(--border2);}
 .master-row.selected,.master-flat-row.selected{background:var(--blue-bg)!important;outline:1.5px solid var(--blue);}
-.master-bulk-bar{display:none;position:sticky;top:0;z-index:5;background:var(--blue);color:white;padding:0.625rem 1rem;border-radius:var(--radius);margin-bottom:0.75rem;align-items:center;gap:10px;font-size:12px;}
+.master-bulk-bar{display:none;position:sticky;top:0;z-index:20;background:var(--blue);color:white;padding:0.625rem 1rem;border-radius:var(--radius);margin-bottom:0.75rem;align-items:center;gap:10px;font-size:12px;box-shadow:0 2px 8px rgba(37,99,235,0.35);}
 .master-bulk-bar.active{display:flex;}
 .master-bulk-btn{padding:4px 12px;border-radius:6px;border:1.5px solid rgba(255,255,255,0.4);background:rgba(255,255,255,0.12);color:white;cursor:pointer;font-size:12px;font-family:var(--font-body);transition:all 0.12s;}
 .master-bulk-btn:hover{background:rgba(255,255,255,0.25);}
@@ -524,8 +524,8 @@ body.light-forced .theme-toggle-knob{left:16px;background:var(--amber);}
 .picker-check{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--border2);flex-shrink:0;}
 
 /* NEXT-OCCURRENCE COUNTDOWN */
-.next-occurrence{font-family:var(--font-mono);font-size:9px;color:var(--green);background:var(--green-bg);padding:2px 6px;border-radius:3px;white-space:nowrap;display:inline-flex;align-items:center;gap:3px;}
-.next-occurrence.soon{color:var(--amber);background:var(--amber-bg);}
+.next-occurrence{font-family:var(--font-mono);font-size:11px;font-weight:500;color:var(--green);background:var(--green-bg);padding:4px 8px;border-radius:var(--radius);white-space:nowrap;display:inline-flex;align-items:center;gap:4px;border:1px solid var(--green-mid);}
+.next-occurrence.soon{color:var(--amber);background:var(--amber-bg);border-color:var(--amber);}
 
 /* RESCHEDULE MODAL */
 .reschedule-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center;}
@@ -991,25 +991,24 @@ function getColors(wz){
 // Called once on load: ensures Daily/Weekly/Monthly missions have a fresh "To Do" copy for today
 function processRepeatingMissions(){
   const lastRun = state.lastProcessedDate || '';
-  if(lastRun === TODAYSTR) return; // already ran today
-  
+  // Always run — but skip duplicate creation if already ran today
+  // This ensures imports with old lastProcessedDate still show today's tasks
+
   const templates = state.missions.filter(m => m.templateId);
-  // For each template, check if today already has a fresh instance
   templates.forEach(tmpl => {
     if(tmpl.type === 'Daily'){
-      // Check if there's already a To Do entry for today
-      const todayExists = state.missions.some(m =>
-        m.templateId === tmpl.templateId && m.date === TODAYSTR && m.id !== tmpl.id
-      );
-      if(!todayExists && tmpl.date !== TODAYSTR){
-        // Create fresh instance for today
-        const newId = Math.max(...state.missions.map(m=>m.id)) + 1;
-        state.missions.push({...tmpl, id:newId, date:TODAYSTR, status:'To Do'});
-      } else if(tmpl.date !== TODAYSTR){
-        // Move template date forward to today
+      // Always ensure template itself is on today's date
+      if(tmpl.date !== TODAYSTR){
         tmpl.date = TODAYSTR;
         tmpl.status = 'To Do';
       }
+      // Remove any duplicate daily instances from previous days (keep today's only)
+      const duplicates = state.missions.filter(m =>
+        m.templateId === tmpl.templateId && m.date !== TODAYSTR && m.id !== tmpl.id
+      );
+      duplicates.forEach(d => {
+        state.missions = state.missions.filter(m => m.id !== d.id);
+      });
     }
   });
 
@@ -1189,6 +1188,9 @@ function buildMissionCard(m,isPushed){
   const cdText=getCountdownText(m);
   const nextOcc=getNextOccurrenceText(m);
   const nextOccHtml=nextOcc?`<span class="next-occurrence ${nextOcc.soon?'soon':''}">↻ ${nextOcc.text}</span>`:'';
+  // Determine next GWS slot for the advance button
+  const currentSlot=getGwsSlot(t)||1;
+  const nextSlot=currentSlot<4?currentSlot+1:null;
   return `<div class="mission-card ${isDone?'done':''} ${isPushed?'pushed':''}" id="mc-${m.id}">
     <div class="mission-check ${isDone?'checked':''}" onclick="toggleMission(${m.id})"></div>
     <div class="mission-info">
@@ -1209,6 +1211,7 @@ function buildMissionCard(m,isPushed){
       <div class="gws-badge">⏱ ${m.gws} GWS</div>
       <div style="display:flex;gap:4px;">
         ${isPushed?`<button class="push-btn" onclick="moveToToday(${m.id})">→ Today</button>`:''}
+        ${!isDone&&!isPushed&&nextSlot?`<button class="icon-btn" onclick="advanceGws(${m.id},${nextSlot})" title="Move to GWS #${nextSlot}">⏩</button>`:''}
         ${!isDone&&!isPushed?`<button class="icon-btn" onclick="askPush(${m.id})" title="Reschedule">↷</button>`:''}
         <button class="icon-btn edit-btn" onclick="openMissionModal(${m.id})" title="Edit">✎</button>
         <button class="icon-btn del-btn" onclick="deleteMission(${m.id})" title="Delete">×</button>
@@ -1216,6 +1219,22 @@ function buildMissionCard(m,isPushed){
     </div>
   </div>`;
 }
+
+function advanceGws(id, nextSlot){
+  const m=state.missions.find(x=>x.id===id);
+  if(!m) return;
+  // Open reschedule modal pre-filled with same date and next GWS slot
+  rescheduleMissionId=id;
+  reschedulePreviewData=null;
+  document.getElementById('reschedule-mission-name').textContent=m.name;
+  document.getElementById('reschedule-date').value=m.date;
+  document.getElementById('reschedule-gws-slot').value=String(nextSlot);
+  document.getElementById('reschedule-cascade-preview').style.display='none';
+  document.getElementById('reschedule-preview-btn').style.display='';
+  document.getElementById('reschedule-confirm-btn').style.display='none';
+  document.getElementById('reschedule-overlay').classList.add('open');
+}
+
 
 function toggleMission(id){
   const m=state.missions.find(x=>x.id===id);
