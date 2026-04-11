@@ -117,35 +117,61 @@ body{font-family:var(--font-body);background:var(--bg1);color:var(--tx0);min-hei
 .time-header{display:flex;align-items:center;gap:10px;padding:0.5rem 0 0.25rem;margin-top:0.75rem;}
 .time-label{font-family:var(--font-mono);font-size:11px;font-weight:500;color:var(--tx2);min-width:58px;}
 .time-divider{flex:1;height:1px;background:var(--border);}
-.mission-card{background:var(--bg0);border:1px solid var(--border);border-radius:var(--radius);padding:0.7rem 0.875rem;margin-bottom:0.375rem;display:flex;align-items:flex-start;gap:10px;transition:all 0.15s;cursor:default;position:relative;}
+/* COMPACT MISSION CARD */
+.mission-card{background:var(--bg0);border:1px solid var(--border);border-radius:var(--radius);padding:0.4rem 0.75rem;margin-bottom:0.2rem;display:flex;align-items:center;gap:8px;transition:all 0.15s;cursor:default;position:relative;}
 .mission-card:hover{border-color:var(--border2);box-shadow:var(--shadow);}
 .mission-card.done{opacity:0.45;}
 .mission-card.pushed{border-left:3px solid var(--amber);}
-.mission-check{width:17px;height:17px;border-radius:4px;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;background:var(--bg1);transition:all 0.15s;margin-top:1px;}
+.mission-check{width:15px;height:15px;border-radius:3px;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;background:var(--bg1);transition:all 0.15s;}
 .mission-check:hover{border-color:var(--tx1);}
 .mission-check.checked{background:var(--green);border-color:var(--green);}
-.mission-check.checked::after{content:'';display:block;width:7px;height:4.5px;border-left:1.5px solid white;border-bottom:1.5px solid white;transform:rotate(-45deg) translateY(-1px);}
+.mission-check.checked::after{content:'';display:block;width:6px;height:4px;border-left:1.5px solid white;border-bottom:1.5px solid white;transform:rotate(-45deg) translateY(-1px);}
 .mission-info{flex:1;min-width:0;}
-.mission-time-prominent{font-family:var(--font-mono);font-size:13px;font-weight:500;color:var(--tx0);margin-bottom:2px;}
-.mission-name{font-size:13px;font-weight:500;line-height:1.4;}
+.mission-top-row{display:flex;align-items:center;gap:6px;overflow:hidden;}
+.mission-time-compact{font-family:var(--font-mono);font-size:10px;font-weight:500;color:var(--tx2);flex-shrink:0;}
+.mission-name{font-size:12.5px;font-weight:500;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
 .mission-name.done{text-decoration:line-through;color:var(--tx2);}
-.mission-meta{display:flex;gap:5px;margin-top:4px;flex-wrap:wrap;align-items:center;}
-.tag{font-size:10px;padding:2px 6px;border-radius:4px;font-weight:500;}
+.mission-tags{display:flex;gap:3px;flex-shrink:0;align-items:center;}
+.mission-notes{font-size:10.5px;color:var(--tx2);margin-top:1px;line-height:1.4;}
+.mission-right{display:flex;align-items:center;gap:3px;flex-shrink:0;}
+.tag{font-size:9px;padding:1px 5px;border-radius:3px;font-weight:500;}
 .tag-red{background:var(--red-bg);color:var(--red);}
 .tag-blue{background:var(--blue-bg);color:var(--blue);}
 .tag-green{background:var(--green-bg);color:var(--green);}
 .tag-gray{background:var(--bg2);color:var(--tx2);border:1px solid var(--border);}
 .tag-critical{background:#FEE2E2;color:#B91C1C;}
 .tag-amber{background:var(--amber-bg);color:var(--amber);}
-.mission-notes{font-size:11px;color:var(--tx2);margin-top:3px;line-height:1.5;}
-.mission-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;}
-.gws-badge{font-family:var(--font-mono);font-size:10px;color:var(--tx3);display:flex;align-items:center;gap:3px;}
-.push-btn{font-size:10px;background:var(--amber-bg);color:var(--amber);border:none;padding:2px 7px;border-radius:4px;cursor:pointer;font-family:var(--font-body);}
+.gws-badge{font-family:var(--font-mono);font-size:9px;color:var(--tx3);display:flex;align-items:center;gap:2px;}
+.push-btn{font-size:9px;background:var(--amber-bg);color:var(--amber);border:none;padding:1px 6px;border-radius:3px;cursor:pointer;font-family:var(--font-body);}
 .push-btn:hover{opacity:0.8;}
-.icon-btn{font-size:11px;color:var(--tx3);cursor:pointer;padding:2px 5px;border-radius:4px;border:1px solid var(--border);background:none;font-family:var(--font-body);transition:all 0.12s;}
+.icon-btn{font-size:11px;color:var(--tx3);cursor:pointer;padding:1px 4px;border-radius:3px;border:1px solid var(--border);background:none;font-family:var(--font-body);transition:all 0.12s;}
 .icon-btn:hover{color:var(--tx0);border-color:var(--border2);}
 .icon-btn.edit-btn:hover{color:var(--blue);border-color:var(--blue);}
 .icon-btn.del-btn:hover{color:var(--red);border-color:var(--red);}
+
+/* MISSION DETAIL / EDIT MODAL */
+.detail-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:150;align-items:center;justify-content:center;}
+.detail-overlay.open{display:flex;}
+.detail-modal{background:var(--bg0);border-radius:var(--radius-xl);border:1px solid var(--border);width:560px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);display:flex;flex-direction:column;}
+.detail-header{padding:1rem 1.25rem 0.75rem;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px;flex-shrink:0;}
+.detail-title-input{font-family:var(--font-head);font-size:17px;font-weight:700;flex:1;border:none;background:transparent;color:var(--tx0);outline:none;line-height:1.3;padding:2px 4px;border-radius:4px;}
+.detail-title-input:hover{background:var(--bg1);}
+.detail-title-input:focus{background:var(--blue-bg);}
+.detail-body{padding:0.875rem 1.25rem;flex:1;}
+.detail-field{display:flex;align-items:center;gap:10px;padding:0.35rem 0;border-bottom:1px solid var(--border);}
+.detail-field:last-child{border-bottom:none;}
+.detail-field-label{font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:0.07em;font-family:var(--font-mono);min-width:88px;flex-shrink:0;}
+.detail-field select,.detail-field input[type=text],.detail-field input[type=date],.detail-field input[type=time]{font-size:12.5px;padding:3px 7px;border-radius:var(--radius);border:1px solid transparent;background:transparent;color:var(--tx0);font-family:var(--font-body);width:100%;cursor:pointer;}
+.detail-field select:hover,.detail-field input:hover{border-color:var(--border2);background:var(--bg1);}
+.detail-field select:focus,.detail-field input:focus{border-color:var(--blue);background:var(--blue-bg);outline:none;}
+.detail-gws-row{display:flex;align-items:center;gap:6px;}
+.detail-gws-btn{font-size:12px;padding:2px 9px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg1);color:var(--tx1);cursor:pointer;transition:all 0.12s;line-height:1.4;}
+.detail-gws-btn:hover{background:var(--bg2);border-color:var(--tx2);}
+.detail-gws-val{font-family:var(--font-mono);font-size:12.5px;color:var(--tx0);min-width:60px;text-align:center;}
+.detail-notes-area{width:100%;font-size:12.5px;padding:6px 8px;border-radius:var(--radius);border:1px solid transparent;background:transparent;color:var(--tx0);font-family:var(--font-body);resize:vertical;min-height:80px;line-height:1.6;box-sizing:border-box;}
+.detail-notes-area:hover{border-color:var(--border2);background:var(--bg1);}
+.detail-notes-area:focus{border-color:var(--blue);background:var(--blue-bg);outline:none;}
+.detail-footer{padding:0.875rem 1.25rem;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;flex-shrink:0;}
 .empty-state{text-align:center;padding:2rem;color:var(--tx3);font-size:12px;border:1px dashed var(--border);border-radius:var(--radius);font-family:var(--font-mono);}
 
 /* PUSHED SECTION */
@@ -1189,55 +1215,93 @@ function buildMissionCard(m,isPushed){
   const col=getColors(m.warzone);
   const t=m.time||autoAssignTime(m);
   const typeColor=m.type==='One-Time'?'tag-red':m.type==='Daily'?'tag-blue':m.type==='Weekly'?'tag-amber':'tag-green';
-  const wzEmoji=m.warzone==='Money Making'?'💰':m.warzone==='Self-Improvement'?'🧠':'💚';
   const cdText=getCountdownText(m);
   const nextOcc=getNextOccurrenceText(m);
   const nextOccHtml=nextOcc?`<span class="next-occurrence ${nextOcc.soon?'soon':''}">↻ ${nextOcc.text}</span>`:'';
-  // Determine next GWS slot for the advance button
   const currentSlot=getGwsSlot(t)||1;
+  const prevSlot=currentSlot>1?currentSlot-1:null;
   const nextSlot=currentSlot<4?currentSlot+1:null;
   return `<div class="mission-card ${isDone?'done':''} ${isPushed?'pushed':''}" id="mc-${m.id}">
     <div class="mission-check ${isDone?'checked':''}" onclick="toggleMission(${m.id})"></div>
-    <div class="mission-info">
-      <div class="mission-time-prominent">${formatTime(t)}</div>
-      <div class="mission-name ${isDone?'done':''}">${m.name}</div>
-      <div class="mission-meta">
-        <span class="tag ${col.wtag}">${wzEmoji} ${m.battlefront}</span>
-        <span class="tag ${typeColor}">${m.type}</span>
-        ${m.priority==='Critical'?'<span class="tag tag-critical">Critical</span>':''}
-        ${isPushed?'<span class="tag tag-amber">Pushed</span>':''}
-        ${m.checkpoint?`<span class="tag tag-gray">📍 ${m.checkpoint}</span>`:''}
-        ${cdText?`<span class="countdown-badge ${cdText==='Due today'?'due-soon':''}">${cdText}</span>`:''}
+    <div class="mission-info" onclick="openDetailModal(${m.id})" style="cursor:pointer;">
+      <div class="mission-top-row">
+        <span class="mission-time-compact">${formatTime(t)}</span>
+        <span class="mission-name ${isDone?'done':''}">${m.name}</span>
+        <div class="mission-tags">
+          <span class="tag ${col.wtag}">${m.battlefront}</span>
+          <span class="tag ${typeColor}">${m.type}</span>
+          ${m.priority==='Critical'?'<span class="tag tag-critical">!</span>':''}
+          ${isPushed?'<span class="tag tag-amber">Pushed</span>':''}
+          ${cdText?`<span class="countdown-badge ${cdText==='Due today'?'due-soon':''}">${cdText}</span>`:''}
+        </div>
       </div>
       ${m.notes?`<div class="mission-notes">${m.notes}</div>`:''}
     </div>
     <div class="mission-right">
       ${nextOccHtml}
-      <div class="gws-badge">⏱ ${m.gws} GWS</div>
-      <div style="display:flex;gap:4px;">
-        ${isPushed?`<button class="push-btn" onclick="moveToToday(${m.id})">→ Today</button>`:''}
-        ${!isDone&&!isPushed&&nextSlot?`<button class="icon-btn" onclick="advanceGws(${m.id},${nextSlot})" title="Move to GWS #${nextSlot}">⏩</button>`:''}
-        ${!isDone&&!isPushed?`<button class="icon-btn" onclick="askPush(${m.id})" title="Reschedule">↷</button>`:''}
-        <button class="icon-btn edit-btn" onclick="openMissionModal(${m.id})" title="Edit">✎</button>
-        <button class="icon-btn del-btn" onclick="deleteMission(${m.id})" title="Delete">×</button>
-      </div>
+      <span class="gws-badge">⏱${m.gws}G</span>
+      ${isPushed?`<button class="push-btn" onclick="moveToToday(${m.id})">→ Today</button>`:''}
+      ${!isDone&&!isPushed&&prevSlot?`<button class="icon-btn" onclick="shiftGwsDaily(${m.id},-1)" title="Pull back to GWS #${prevSlot}">◀</button>`:''}
+      ${!isDone&&!isPushed&&nextSlot?`<button class="icon-btn" onclick="shiftGwsDaily(${m.id},1)" title="Push to GWS #${nextSlot}">▶</button>`:''}
+      ${!isDone&&!isPushed?`<button class="icon-btn" onclick="askPush(${m.id})" title="Reschedule">↷</button>`:''}
+      <button class="icon-btn del-btn" onclick="deleteMission(${m.id})" title="Delete">×</button>
     </div>
   </div>`;
 }
 
-function advanceGws(id, nextSlot){
+function advanceGws(id, nextSlot){ shiftGwsDaily(id, 1); } // legacy alias
+
+// Instant GWS shift with cascade — used by daily checklist ◀ ▶ buttons
+function shiftGwsDaily(id, direction){
   const m=state.missions.find(x=>x.id===id);
   if(!m) return;
-  // Open reschedule modal pre-filled with same date and next GWS slot
-  rescheduleMissionId=id;
-  reschedulePreviewData=null;
-  document.getElementById('reschedule-mission-name').textContent=m.name;
-  document.getElementById('reschedule-date').value=m.date;
-  document.getElementById('reschedule-gws-slot').value=String(nextSlot);
-  document.getElementById('reschedule-cascade-preview').style.display='none';
-  document.getElementById('reschedule-preview-btn').style.display='';
-  document.getElementById('reschedule-confirm-btn').style.display='none';
-  document.getElementById('reschedule-overlay').classList.add('open');
+  const t=m.time||autoAssignTime(m);
+  const currentSlot=getGwsSlot(t)||1;
+  const targetSlot=currentSlot+direction;
+  if(targetSlot<1||targetSlot>4) return;
+
+  // Use same cascade logic as confirmReschedule but applied instantly
+  const targetDate=m.date;
+  const mGws=parseInt(m.gws)||1;
+
+  // Build slot map for targetDate excluding this mission
+  const slotMap={1:[],2:[],3:[],4:[]};
+  state.missions.forEach(x=>{
+    if(x.id===id||x.status==='Done'||x.date!==targetDate) return;
+    const slot=getGwsSlot(x.time||autoAssignTime(x));
+    if(slot) slotMap[slot].push(x);
+  });
+
+  // Cascade: collect One-Time missions in slots >= targetSlot, push them forward
+  const cascadeChanges=[];
+  let nextFreeSlot=targetSlot+mGws;
+  const slotsToShift=[];
+  for(let s=targetSlot;s<=4;s++){
+    slotMap[s].forEach(x=>{ if(x.type==='One-Time') slotsToShift.push({mission:x,fromSlot:s}); });
+  }
+  slotsToShift.forEach(item=>{
+    while(nextFreeSlot<=4&&slotMap[nextFreeSlot]&&slotMap[nextFreeSlot].some(x=>x.type==='Weekly'||x.type==='Monthly')) nextFreeSlot++;
+    if(nextFreeSlot<=4){
+      cascadeChanges.push({mission:item.mission,newSlot:nextFreeSlot,newDate:targetDate});
+      nextFreeSlot++;
+    } else {
+      const nd=new Date(targetDate+'T00:00:00'); nd.setDate(nd.getDate()+1);
+      const ndStr=nd.getFullYear()+'-'+String(nd.getMonth()+1).padStart(2,'0')+'-'+String(nd.getDate()).padStart(2,'0');
+      cascadeChanges.push({mission:item.mission,newSlot:1,newDate:ndStr});
+      nextFreeSlot++;
+    }
+  });
+
+  // Apply
+  m.time=gwsStartTime(targetSlot);
+  m.status='To Do';
+  cascadeChanges.forEach(c=>{ c.mission.date=c.newDate; c.mission.time=gwsStartTime(c.newSlot); });
+  save(); renderDaily(); renderCalendar(); renderMaster();
+}
+
+// Master list instant GWS shift — same cascade, triggers from master list buttons
+function shiftGwsMaster(id, direction){
+  shiftGwsDaily(id, direction);
 }
 
 
@@ -1562,7 +1626,7 @@ function openBattlefrontPanel(wi,bi){
           <button class="icon-btn edit-btn" onclick="openMissionModal(${m.id})">✎</button>
         </div>`).join('')}
       ${state.missions.filter(m=>m.battlefront===bf.name).length>5?`<div style="font-size:11px;color:var(--tx2);margin-top:4px;">+${state.missions.filter(m=>m.battlefront===bf.name).length-5} more</div>`:''}
-      <button class="btn" style="width:100%;margin-top:8px;font-size:12px;" onclick="openMissionModal(null);document.getElementById('m-battlefront').value='${bf.name}';document.getElementById('m-warzone').value='${state.warzones[wi].name}'">+ Add Mission</button>
+      <button class="btn" style="width:100%;margin-top:8px;font-size:12px;" onclick="openNewMissionModal('${bf.name}','${state.warzones[wi].name}')">+ Add Mission</button>
     </div>
   `;
   document.getElementById('panel-footer').innerHTML=`
@@ -1687,7 +1751,9 @@ function renderMaster(){
           <span style="font-family:var(--font-mono);font-size:10px;color:var(--tx2);">${m.date}</span>
           <div style="display:flex;gap:4px;align-items:center;">
             ${nextOcc?`<span class="next-occurrence ${nextOcc.soon?'soon':''}">↻ ${nextOcc.text}</span>`:''}
-            <button class="icon-btn edit-btn" onclick="openMissionModal(${m.id})">✎</button>
+            <button class="icon-btn" onclick="shiftGwsMaster(${m.id},-1)" title="Pull back 1 GWS">◀</button>
+            <button class="icon-btn" onclick="shiftGwsMaster(${m.id},1)" title="Push forward 1 GWS">▶</button>
+            <button class="icon-btn edit-btn" onclick="openDetailModal(${m.id})">✎</button>
             <button class="icon-btn del-btn" onclick="deleteMission(${m.id})">×</button>
           </div>
         </div>`;
@@ -1731,7 +1797,9 @@ function renderMaster(){
             <span style="font-family:var(--font-mono);font-size:10px;color:var(--tx2);">${m.gws} GWS</span>
             <div style="display:flex;gap:4px;align-items:center;">
               ${nextOcc?`<span class="next-occurrence ${nextOcc.soon?'soon':''}">↻ ${nextOcc.text}</span>`:''}
-              <button class="icon-btn edit-btn" onclick="openMissionModal(${m.id})">✎</button>
+              <button class="icon-btn" onclick="shiftGwsMaster(${m.id},-1)" title="Pull back 1 GWS">◀</button>
+              <button class="icon-btn" onclick="shiftGwsMaster(${m.id},1)" title="Push forward 1 GWS">▶</button>
+              <button class="icon-btn edit-btn" onclick="openDetailModal(${m.id})">✎</button>
               <button class="icon-btn del-btn" onclick="deleteMission(${m.id})">×</button>
             </div>
           </div>`;
@@ -1743,39 +1811,30 @@ function renderMaster(){
 
 // ── MISSION MODAL ──
 function openMissionModal(id){
-  editingMissionId=id;
-  const modal=document.getElementById('mission-modal');
-  const deleteBtn=document.getElementById('mission-modal-delete-btn');
-  if(id!==null){
-    const m=state.missions.find(x=>x.id===id);
-    if(!m) return;
-    document.getElementById('mission-modal-title').textContent='Edit Mission';
-    document.getElementById('m-name').value=m.name;
-    document.getElementById('m-warzone').value=m.warzone;
-    document.getElementById('m-battlefront').value=m.battlefront;
-    document.getElementById('m-type').value=m.type;
-    document.getElementById('m-priority').value=m.priority;
-    document.getElementById('m-date').value=m.date;
-    document.getElementById('m-time').value=m.time||'';
-    document.getElementById('m-gws').value=m.gws;
-    document.getElementById('m-checkpoint').value=m.checkpoint||'';
-    document.getElementById('m-notes').value=m.notes||'';
-    deleteBtn.style.display='block';
-  } else {
-    document.getElementById('mission-modal-title').textContent='Add New Mission';
-    document.getElementById('m-name').value='';
-    document.getElementById('m-warzone').value='Money Making';
-    document.getElementById('m-battlefront').value='';
-    document.getElementById('m-type').value='One-Time';
-    document.getElementById('m-priority').value='Critical';
-    document.getElementById('m-date').value=TODAYSTR;
-    document.getElementById('m-time').value='';
-    document.getElementById('m-gws').value='1';
-    document.getElementById('m-checkpoint').value='';
-    document.getElementById('m-notes').value='';
-    deleteBtn.style.display='none';
+  // Route all edit calls through the detail modal
+  if(id !== null && id !== undefined){
+    openDetailModal(id);
+    return;
   }
-  modal.classList.add('open');
+  // "Add new" — open detail modal blank
+  openNewMissionModal();
+}
+
+function openNewMissionModal(prefillBattlefront, prefillWarzone){
+  detailMissionId = null;
+  detailGws = 1;
+  document.getElementById('detail-name').value = '';
+  document.getElementById('detail-warzone').value = prefillWarzone || 'Money Making';
+  document.getElementById('detail-battlefront').value = prefillBattlefront || '';
+  document.getElementById('detail-type').value = 'One-Time';
+  document.getElementById('detail-priority').value = 'Critical';
+  document.getElementById('detail-date').value = TODAYSTR;
+  document.getElementById('detail-time').value = '';
+  document.getElementById('detail-gws-val').textContent = '1 GWS';
+  document.getElementById('detail-checkpoint').value = '';
+  document.getElementById('detail-notes').value = '';
+  document.getElementById('detail-status').value = 'To Do';
+  document.getElementById('detail-overlay').classList.add('open');
 }
 function closeMissionModal(){document.getElementById('mission-modal').classList.remove('open');editingMissionId=null;}
 function deleteMissionFromModal(){
@@ -1810,6 +1869,80 @@ function saveMissionModal(){
     state.missions.push({id:newId,...data});
   }
   save(); closeMissionModal(); renderDaily(); renderWarzones(); renderMaster(); renderCalendar();
+}
+
+
+// ── DETAIL / EDIT MODAL ──
+let detailMissionId = null;
+let detailGws = 1;
+
+function openDetailModal(id){
+  const m = state.missions.find(x => x.id === id);
+  if(!m) return;
+  detailMissionId = id;
+  detailGws = parseInt(m.gws) || 1;
+  document.getElementById('detail-name').value = m.name;
+  document.getElementById('detail-warzone').value = m.warzone;
+  document.getElementById('detail-battlefront').value = m.battlefront || '';
+  document.getElementById('detail-type').value = m.type;
+  document.getElementById('detail-priority').value = m.priority;
+  document.getElementById('detail-date').value = m.date || '';
+  document.getElementById('detail-time').value = m.time || '';
+  document.getElementById('detail-gws-val').textContent = detailGws + ' GWS';
+  document.getElementById('detail-checkpoint').value = m.checkpoint || '';
+  document.getElementById('detail-notes').value = m.notes || '';
+  document.getElementById('detail-status').value = m.status || 'To Do';
+  document.getElementById('detail-overlay').classList.add('open');
+}
+
+function closeDetailModal(){
+  document.getElementById('detail-overlay').classList.remove('open');
+  detailMissionId = null;
+}
+
+function detailShiftGws(dir){
+  const next = detailGws + dir;
+  if(next < 1 || next > 4) return;
+  detailGws = next;
+  document.getElementById('detail-gws-val').textContent = detailGws + ' GWS';
+}
+
+function saveDetailModal(){
+  const name = document.getElementById('detail-name').value.trim();
+  if(!name){ alert('Mission name is required.'); return; }
+  const data = {
+    name,
+    warzone: document.getElementById('detail-warzone').value,
+    battlefront: document.getElementById('detail-battlefront').value.trim() || 'General',
+    type: document.getElementById('detail-type').value,
+    priority: document.getElementById('detail-priority').value,
+    date: document.getElementById('detail-date').value || TODAYSTR,
+    time: document.getElementById('detail-time').value || '',
+    gws: detailGws,
+    checkpoint: document.getElementById('detail-checkpoint').value.trim(),
+    notes: document.getElementById('detail-notes').value.trim(),
+    status: document.getElementById('detail-status').value
+  };
+  if(detailMissionId !== null){
+    // Edit existing
+    const m = state.missions.find(x => x.id === detailMissionId);
+    if(!m) return;
+    Object.assign(m, {...data, status: data.status});
+    if(m.type === 'Daily' && !m.templateId) m.templateId = 'custom-daily-' + m.id;
+  } else {
+    // Add new
+    const newId = state.missions.length ? Math.max(...state.missions.map(m=>m.id))+1 : 1;
+    if(data.type === 'Daily') data.templateId = 'custom-daily-' + newId;
+    state.missions.push({id: newId, ...data});
+  }
+  save(); closeDetailModal(); renderDaily(); renderWarzones(); renderMaster(); renderCalendar();
+}
+
+function deleteFromDetail(){
+  if(detailMissionId === null) return;
+  if(!confirm('Delete this mission?')) return;
+  state.missions = state.missions.filter(x => x.id !== detailMissionId);
+  save(); closeDetailModal(); renderDaily(); renderWarzones(); renderMaster(); renderCalendar();
 }
 
 // ── CALENDAR ──
@@ -1879,8 +2012,8 @@ function openCalDayModal(dateStr){
 function closeCalDayModal(){document.getElementById('cal-day-modal').classList.remove('open');}
 function addMissionFromCalDay(){
   closeCalDayModal();
-  openMissionModal(null);
-  if(calDayModalDate) document.getElementById('m-date').value=calDayModalDate;
+  openNewMissionModal();
+  if(calDayModalDate) document.getElementById('detail-date').value=calDayModalDate;
 }
 
 // ── VISION PAGE ──
@@ -2546,6 +2679,85 @@ setInterval(()=>{
   if(dailyActive) renderDaily();
 }, 60000);
 </script>
+
+<!-- MISSION DETAIL / EDIT MODAL -->
+<div class="detail-overlay" id="detail-overlay" onclick="if(event.target===this)closeDetailModal()">
+  <div class="detail-modal">
+    <div class="detail-header">
+      <input class="detail-title-input" id="detail-name" type="text" placeholder="Mission name..."/>
+      <button class="panel-close" onclick="closeDetailModal()">✕</button>
+    </div>
+    <div class="detail-body">
+      <div class="detail-field">
+        <span class="detail-field-label">Warzone</span>
+        <select id="detail-warzone" class="detail-field-value">
+          <option value="Money Making">Money Making</option>
+          <option value="Self-Improvement">Self-Improvement</option>
+          <option value="Family &amp; Relationship">Family &amp; Relationship</option>
+        </select>
+      </div>
+      <div class="detail-field">
+        <span class="detail-field-label">Battlefront</span>
+        <input type="text" id="detail-battlefront" class="detail-field-value" placeholder="e.g. KSV Dental Clinic"/>
+      </div>
+      <div class="detail-field">
+        <span class="detail-field-label">Type</span>
+        <select id="detail-type" class="detail-field-value">
+          <option value="One-Time">One-Time</option>
+          <option value="Daily">Daily</option>
+          <option value="Weekly">Weekly</option>
+          <option value="Monthly">Monthly</option>
+        </select>
+      </div>
+      <div class="detail-field">
+        <span class="detail-field-label">Priority</span>
+        <select id="detail-priority" class="detail-field-value">
+          <option value="Critical">Critical</option>
+          <option value="High">High</option>
+          <option value="Normal">Normal</option>
+          <option value="Medium">Medium</option>
+        </select>
+      </div>
+      <div class="detail-field">
+        <span class="detail-field-label">Date</span>
+        <input type="date" id="detail-date" class="detail-field-value"/>
+      </div>
+      <div class="detail-field">
+        <span class="detail-field-label">Time</span>
+        <input type="time" id="detail-time" class="detail-field-value"/>
+      </div>
+      <div class="detail-field">
+        <span class="detail-field-label">GWS</span>
+        <div class="detail-gws-row">
+          <button class="detail-gws-btn" onclick="detailShiftGws(-1)">◀</button>
+          <span class="detail-gws-val" id="detail-gws-val">1 GWS</span>
+          <button class="detail-gws-btn" onclick="detailShiftGws(1)">▶</button>
+        </div>
+      </div>
+      <div class="detail-field">
+        <span class="detail-field-label">Checkpoint</span>
+        <input type="text" id="detail-checkpoint" class="detail-field-value" placeholder="Optional checkpoint"/>
+      </div>
+      <div class="detail-field" style="align-items:flex-start;">
+        <span class="detail-field-label" style="padding-top:6px;">Notes</span>
+        <textarea class="detail-notes-area" id="detail-notes" placeholder="Context, sub-tasks, or anything you need to know..."></textarea>
+      </div>
+      <div class="detail-field">
+        <span class="detail-field-label">Status</span>
+        <select id="detail-status" class="detail-field-value">
+          <option value="To Do">To Do</option>
+          <option value="Done">Done</option>
+        </select>
+      </div>
+    </div>
+    <div class="detail-footer">
+      <button class="btn btn-danger" id="detail-delete-btn" onclick="deleteFromDetail()">Delete</button>
+      <button class="btn" onclick="closeDetailModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveDetailModal()">Save</button>
+    </div>
+  </div>
+</div>
+
 <!-- CALENDAR DAY MODAL -->
 <div class="cal-day-modal" id="cal-day-modal" onclick="if(event.target===this)closeCalDayModal()">
   <div class="cal-day-modal-box">
