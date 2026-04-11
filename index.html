@@ -154,7 +154,7 @@ body{font-family:var(--font-body);background:var(--bg1);color:var(--tx0);min-hei
 .detail-overlay.open{display:flex;}
 .detail-modal{background:var(--bg0);border-radius:var(--radius-xl);border:1px solid var(--border);width:560px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);display:flex;flex-direction:column;}
 .detail-header{padding:1rem 1.25rem 0.75rem;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px;flex-shrink:0;}
-.detail-title-input{font-family:var(--font-head);font-size:17px;font-weight:700;flex:1;border:none;background:transparent;color:var(--tx0);outline:none;line-height:1.3;padding:2px 4px;border-radius:4px;}
+.detail-title-input{font-family:var(--font-head);font-size:22px;font-weight:700;flex:1;border:none;background:transparent;color:var(--tx0);outline:none;line-height:1.3;padding:2px 4px;border-radius:4px;}
 .detail-title-input:hover{background:var(--bg1);}
 .detail-title-input:focus{background:var(--blue-bg);}
 .detail-body{padding:0.875rem 1.25rem;flex:1;}
@@ -172,6 +172,26 @@ body{font-family:var(--font-body);background:var(--bg1);color:var(--tx0);min-hei
 .detail-notes-area:hover{border-color:var(--border2);background:var(--bg1);}
 .detail-notes-area:focus{border-color:var(--blue);background:var(--blue-bg);outline:none;}
 .detail-footer{padding:0.875rem 1.25rem;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;flex-shrink:0;}
+/* RESCHEDULE CARD inside detail modal */
+.detail-reschedule-card{background:var(--amber-bg);border:1px solid var(--amber);border-radius:var(--radius-lg);padding:0.875rem 1rem;margin-top:1rem;}
+.detail-reschedule-card-title{font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:0.08em;font-family:var(--font-mono);margin-bottom:0.625rem;display:flex;align-items:center;gap:6px;}
+.detail-reschedule-row{display:flex;align-items:center;gap:8px;margin-bottom:0.5rem;flex-wrap:wrap;}
+.detail-reschedule-row label{font-size:11px;color:var(--tx1);min-width:80px;flex-shrink:0;}
+.detail-reschedule-row input,.detail-reschedule-row select{font-size:12px;padding:4px 8px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg0);color:var(--tx0);font-family:var(--font-body);}
+.detail-reschedule-cascade-toggle{display:flex;align-items:center;gap:8px;margin-bottom:0.625rem;}
+.detail-reschedule-cascade-toggle label{font-size:12px;color:var(--tx0);cursor:pointer;}
+.detail-reschedule-apply-btn{width:100%;padding:0.45rem;border-radius:var(--radius);border:none;background:var(--amber);color:white;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font-body);transition:opacity 0.12s;}
+.detail-reschedule-apply-btn:hover{opacity:0.85;}
+/* Date+Time side by side */
+.detail-datetime-row{display:flex;gap:8px;flex:1;}
+.detail-datetime-row input{flex:1;font-size:12.5px;padding:3px 7px;border-radius:var(--radius);border:1px solid transparent;background:transparent;color:var(--tx0);font-family:var(--font-body);cursor:pointer;}
+.detail-datetime-row input:hover{border-color:var(--border2);background:var(--bg1);}
+.detail-datetime-row input:focus{border-color:var(--blue);background:var(--blue-bg);outline:none;}
+/* Reschedule button */
+.reschedule-btn{font-size:11px;color:var(--amber);cursor:pointer;padding:2px 7px;border-radius:3px;border:1px solid var(--amber);background:var(--amber-bg);font-family:var(--font-body);transition:all 0.12s;white-space:nowrap;}
+.reschedule-btn:hover{background:var(--amber);color:white;}
+/* GWS#4 warning badge */
+.gws4-warn{font-size:9px;background:#FEF3C7;color:#92400E;border:1px solid #FCD34D;border-radius:3px;padding:1px 5px;font-family:var(--font-mono);}
 .empty-state{text-align:center;padding:2rem;color:var(--tx3);font-size:12px;border:1px dashed var(--border);border-radius:var(--radius);font-family:var(--font-mono);}
 
 /* PUSHED SECTION */
@@ -892,6 +912,7 @@ let masterViewMode = 'grouped';
 let editingMissionId = null;
 let pendingPushId = null;
 let selectedMissions = new Set();
+let lastSelectedId = null;
 let calDayModalDate = null;
 let editingVisionIdx = null;
 let editingOodaId = null;
@@ -1219,8 +1240,6 @@ function buildMissionCard(m,isPushed){
   const nextOcc=getNextOccurrenceText(m);
   const nextOccHtml=nextOcc?`<span class="next-occurrence ${nextOcc.soon?'soon':''}">↻ ${nextOcc.text}</span>`:'';
   const currentSlot=getGwsSlot(t)||1;
-  const prevSlot=currentSlot>1?currentSlot-1:null;
-  const nextSlot=currentSlot<4?currentSlot+1:null;
   return `<div class="mission-card ${isDone?'done':''} ${isPushed?'pushed':''}" id="mc-${m.id}">
     <div class="mission-check ${isDone?'checked':''}" onclick="toggleMission(${m.id})"></div>
     <div class="mission-info" onclick="openDetailModal(${m.id})" style="cursor:pointer;">
@@ -1241,9 +1260,7 @@ function buildMissionCard(m,isPushed){
       ${nextOccHtml}
       <span class="gws-badge">⏱${m.gws}G</span>
       ${isPushed?`<button class="push-btn" onclick="moveToToday(${m.id})">→ Today</button>`:''}
-      ${!isDone&&!isPushed&&prevSlot?`<button class="icon-btn" onclick="shiftGwsDaily(${m.id},-1)" title="Pull back to GWS #${prevSlot}">◀</button>`:''}
-      ${!isDone&&!isPushed&&nextSlot?`<button class="icon-btn" onclick="shiftGwsDaily(${m.id},1)" title="Push to GWS #${nextSlot}">▶</button>`:''}
-      ${!isDone&&!isPushed?`<button class="icon-btn" onclick="askPush(${m.id})" title="Reschedule">↷</button>`:''}
+      ${!isDone?`<button class="reschedule-btn" onclick="event.stopPropagation();askPush(${m.id})">↷ Reschedule</button>`:''}
       <button class="icon-btn del-btn" onclick="deleteMission(${m.id})" title="Delete">×</button>
     </div>
   </div>`;
@@ -1350,7 +1367,7 @@ function askPush(id){
   document.getElementById('reschedule-mission-name').textContent=m.name;
   // Default to tomorrow
   const tomorrow=new Date(TODAY); tomorrow.setDate(tomorrow.getDate()+1);
-  document.getElementById('reschedule-date').value=tomorrow.toISOString().split('T')[0];
+  document.getElementById('reschedule-date').value=localDateStr(tomorrow);
   document.getElementById('reschedule-gws-slot').value='1';
   document.getElementById('reschedule-cascade-preview').style.display='none';
   document.getElementById('reschedule-preview-btn').style.display='';
@@ -1373,6 +1390,16 @@ document.addEventListener('change', e=>{
   }
 });
 
+function localDateStr(d){
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+function slotToMinutes(dateStr, slot){
+  // Convert a date+slot to a comparable number: days * 1000 + slot
+  const d = new Date(dateStr+'T00:00:00');
+  return d.getTime() / 86400000 * 10 + slot;
+}
+
 function previewReschedule(){
   if(!rescheduleMissionId) return;
   const m=state.missions.find(x=>x.id===rescheduleMissionId);
@@ -1381,65 +1408,66 @@ function previewReschedule(){
   const targetSlot=parseInt(document.getElementById('reschedule-gws-slot').value);
   if(!targetDate){alert('Please select a date.');return;}
 
-  // Calculate cascade: find all One-Time missions on targetDate that are not done
-  // Slot order: 1,2,3,4. Weekly/Monthly are immovable.
-  const mGws=parseInt(m.gws)||1; // how many slots this mission takes
-  const slotsNeeded=mGws;
+  const origDate = m.date;
+  const origSlot = getGwsSlot(m.time||autoAssignTime(m)) || 1;
+  const origScore = slotToMinutes(origDate, origSlot);
+  const targetScore = slotToMinutes(targetDate, targetSlot);
+  const slotDelta = targetScore - origScore; // positive = moving later, negative = earlier
 
-  // Build slot map for targetDate
-  // slot -> list of missions occupying it
-  const slotMap={1:[],2:[],3:[],4:[]};
-  state.missions.forEach(x=>{
-    if(x.id===rescheduleMissionId||x.status==='Done'||x.date!==targetDate) return;
-    const slot=getGwsSlot(x.time||autoAssignTime(x));
-    if(slot) slotMap[slot].push(x);
+  // Find all incomplete One-Time missions AFTER the original position
+  // "after" = same date + slot > origSlot, OR date > origDate
+  const toShift = state.missions.filter(x => {
+    if(x.id === rescheduleMissionId || x.status === 'Done') return false;
+    if(x.type === 'Weekly' || x.type === 'Monthly' || x.type === 'Daily') return false;
+    const xSlot = getGwsSlot(x.time||autoAssignTime(x)) || 1;
+    const xScore = slotToMinutes(x.date, xSlot);
+    return xScore > origScore;
   });
 
-  // Simulate placing pushed mission at targetSlot
-  // Cascade: for each slot from targetSlot onward that contains One-Time missions,
-  // push them forward by slotsNeeded slots (skip over Weekly/Monthly)
-  const cascadeChanges=[]; // {mission, newSlot}
-  let slots=[1,2,3,4];
-  let slotsToShift=[];
+  // Calculate new position for each: shift by slotDelta
+  // Each slot = 1 unit; days = 10 units per day (slots 1-4 per day, skip GWS#4 warning)
+  const cascadeChanges = [];
+  const gws4warnings = [];
 
-  // Collect One-Time missions in slots >= targetSlot on targetDate, sorted by slot
-  for(let s=targetSlot;s<=4;s++){
-    slotMap[s].forEach(x=>{
-      if(x.type==='One-Time') slotsToShift.push({mission:x,fromSlot:s});
-    });
-  }
+  toShift.forEach(x => {
+    const xSlot = getGwsSlot(x.time||autoAssignTime(x)) || 1;
+    const xScore = slotToMinutes(x.date, xSlot);
+    let newScore = xScore + slotDelta;
 
-  // Assign new slots, skipping over Weekly/Monthly occupied slots
-  let nextFreeSlot=targetSlot+slotsNeeded;
-  slotsToShift.forEach(item=>{
-    // Skip over slots occupied by Weekly/Monthly
-    while(nextFreeSlot<=4 && slotMap[nextFreeSlot] && slotMap[nextFreeSlot].some(x=>x.type==='Weekly'||x.type==='Monthly')){
-      nextFreeSlot++;
-    }
-    if(nextFreeSlot<=4){
-      cascadeChanges.push({mission:item.mission, newSlot:nextFreeSlot, newDate:targetDate});
-      nextFreeSlot++;
-    } else {
-      // Overflow to next day GWS #1
-      const nextDay=new Date(targetDate+'T00:00:00'); nextDay.setDate(nextDay.getDate()+1);
-      cascadeChanges.push({mission:item.mission, newSlot:1, newDate:nextDay.toISOString().split('T')[0]});
-      nextFreeSlot++;
-    }
+    // Convert newScore back to date + slot
+    let newDay = Math.floor(newScore / 10);
+    let newSlot = Math.round(newScore % 10);
+    if(newSlot < 1) { newDay--; newSlot = 4; }
+    if(newSlot > 4) { newDay++; newSlot = 1; }
+    newSlot = Math.max(1, Math.min(4, newSlot));
+
+    const newDate = localDateStr(new Date(newDay * 86400000));
+    const isGws4 = newSlot === 4;
+    if(isGws4) gws4warnings.push(x.name);
+    cascadeChanges.push({mission:x, newSlot, newDate, isGws4});
   });
 
-  reschedulePreviewData={targetDate, targetSlot, cascadeChanges, mission:m};
+  reschedulePreviewData={targetDate, targetSlot, cascadeChanges, mission:m, slotDelta};
 
-  // Render preview
   const preview=document.getElementById('reschedule-cascade-preview');
+  const gws4warn = gws4warnings.length ? `<div style="margin-top:6px;padding:6px 8px;background:#FEF3C7;border:1px solid #FCD34D;border-radius:4px;font-size:10px;color:#92400E;">⚠ ${gws4warnings.length} task(s) will land on GWS #4 (your reserved slot): ${gws4warnings.slice(0,3).join(', ')}${gws4warnings.length>3?'…':''}</div>` : '';
+
   if(!cascadeChanges.length){
-    preview.innerHTML=`<div style="color:var(--green);">✓ No conflicts — slot is free.</div>`;
+    preview.innerHTML=`<div style="color:var(--green);">✓ No other tasks to shift.</div>`;
   } else {
-    preview.innerHTML=`<div style="color:var(--tx2);margin-bottom:6px;">Cascade preview:</div>`+
-      cascadeChanges.map(c=>`<div class="reschedule-cascade-item">
+    preview.innerHTML=
+      `<div style="color:var(--tx2);margin-bottom:8px;font-size:11px;">${cascadeChanges.length} task(s) will be affected. Move them too?</div>`+
+      `<div style="display:flex;gap:8px;margin-bottom:8px;">
+        <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;"><input type="radio" name="cascade-choice" value="yes"> Yes, shift all</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;"><input type="radio" name="cascade-choice" value="no" checked> No, keep fixed</label>
+      </div>`+
+      `<div style="max-height:140px;overflow-y:auto;">`+
+      cascadeChanges.map(ch=>`<div class="reschedule-cascade-item">
         <span class="reschedule-cascade-arrow">→</span>
-        <span style="flex:1;">${c.mission.name}</span>
-        <span style="color:var(--amber);">GWS #${c.newSlot} · ${c.newDate}</span>
-      </div>`).join('');
+        <span style="flex:1;font-size:11px;">${ch.mission.name}</span>
+        <span style="color:var(--amber);font-size:10px;">${ch.isGws4?'<span class="gws4-warn">GWS#4 ⚠</span> ':''} GWS#${ch.newSlot} · ${ch.newDate}</span>
+      </div>`).join('')+
+      `</div>${gws4warn}`;
   }
   preview.style.display='block';
   document.getElementById('reschedule-preview-btn').style.display='none';
@@ -1449,15 +1477,17 @@ function previewReschedule(){
 function confirmReschedule(){
   if(!reschedulePreviewData) return;
   const {targetDate, targetSlot, cascadeChanges, mission}=reschedulePreviewData;
-  // Apply to pushed mission
+  const cascadeRadio = document.querySelector('input[name="cascade-choice"]:checked');
+  const doCascade = !cascadeRadio || cascadeRadio.value === 'yes';
   mission.date=targetDate;
   mission.time=gwsStartTime(targetSlot);
   mission.status='To Do';
-  // Apply cascade
-  cascadeChanges.forEach(c=>{
-    c.mission.date=c.newDate;
-    c.mission.time=gwsStartTime(c.newSlot);
-  });
+  if(doCascade){
+    cascadeChanges.forEach(ch=>{
+      ch.mission.date=ch.newDate;
+      ch.mission.time=gwsStartTime(ch.newSlot);
+    });
+  }
   save(); closeReschedule(); renderDaily(); renderCalendar(); renderMaster();
 }
 
@@ -1672,16 +1702,34 @@ function setMasterView(v){
 }
 
 let masterSelectMode=false;
-function toggleMasterSelect(id){
+function toggleMasterSelect(id, shiftHeld){
   if(!masterSelectMode){ masterSelectMode=true; }
-  if(selectedMissions.has(id)) selectedMissions.delete(id);
-  else selectedMissions.add(id);
+  if(shiftHeld && lastSelectedId !== null && lastSelectedId !== id){
+    // Range select: find all visible row IDs in DOM order between lastSelectedId and id
+    const allRows = Array.from(document.querySelectorAll('[id^="mrow-"]'));
+    const ids = allRows.map(r => parseInt(r.id.replace('mrow-','')));
+    const fromIdx = ids.indexOf(lastSelectedId);
+    const toIdx = ids.indexOf(id);
+    if(fromIdx !== -1 && toIdx !== -1){
+      const lo = Math.min(fromIdx, toIdx);
+      const hi = Math.max(fromIdx, toIdx);
+      ids.slice(lo, hi+1).forEach(rid => {
+        selectedMissions.add(rid);
+        const row = document.getElementById('mrow-'+rid);
+        if(row) row.classList.add('selected');
+      });
+    }
+  } else {
+    if(selectedMissions.has(id)) selectedMissions.delete(id);
+    else selectedMissions.add(id);
+    const row = document.getElementById('mrow-'+id);
+    if(row) row.classList.toggle('selected', selectedMissions.has(id));
+  }
+  lastSelectedId = id;
   updateBulkBar();
-  const row=document.getElementById('mrow-'+id);
-  if(row) row.classList.toggle('selected', selectedMissions.has(id));
 }
-function masterRowClick(id){
-  if(masterSelectMode) toggleMasterSelect(id);
+function masterRowClick(id, event){
+  if(masterSelectMode) toggleMasterSelect(id, event && event.shiftKey);
 }
 function updateBulkBar(){
   const bar=document.getElementById('master-bulk-bar');
@@ -1740,7 +1788,7 @@ function renderMaster(){
         const isSel=selectedMissions.has(m.id);
         const cdText=getCountdownText(m);
         const nextOcc=getNextOccurrenceText(m);
-        return `<div class="master-flat-row ${isSel?'selected':''}" id="mrow-${m.id}" ondblclick="toggleMasterSelect(${m.id})" onclick="masterRowClick(${m.id})" title="Double-click to start selecting">
+        return `<div class="master-flat-row ${isSel?'selected':''}" id="mrow-${m.id}" ondblclick="toggleMasterSelect(${m.id})" onclick="masterRowClick(${m.id}, event)" title="Double-click to start selecting">
           <div style="display:flex;align-items:center;gap:8px;">
             <div class="status-dot ${m.status==='Done'?'status-dot-done':'status-dot-todo'}"></div>
             <div><div style="font-size:12.5px;font-weight:500;">${m.name}</div>${m.notes?`<div style="font-size:10px;color:var(--tx2);margin-top:2px;">${m.notes.substring(0,60)}${m.notes.length>60?'…':''}</div>`:''}</div>
@@ -1751,8 +1799,7 @@ function renderMaster(){
           <span style="font-family:var(--font-mono);font-size:10px;color:var(--tx2);">${m.date}</span>
           <div style="display:flex;gap:4px;align-items:center;">
             ${nextOcc?`<span class="next-occurrence ${nextOcc.soon?'soon':''}">↻ ${nextOcc.text}</span>`:''}
-            <button class="icon-btn" onclick="shiftGwsMaster(${m.id},-1)" title="Pull back 1 GWS">◀</button>
-            <button class="icon-btn" onclick="shiftGwsMaster(${m.id},1)" title="Push forward 1 GWS">▶</button>
+            <button class="reschedule-btn" onclick="askPush(${m.id})">↷ Reschedule</button>
             <button class="icon-btn edit-btn" onclick="openDetailModal(${m.id})">✎</button>
             <button class="icon-btn del-btn" onclick="deleteMission(${m.id})">×</button>
           </div>
@@ -1786,7 +1833,7 @@ function renderMaster(){
           const isSel=selectedMissions.has(m.id);
           const cdText=getCountdownText(m);
           const nextOcc=getNextOccurrenceText(m);
-          return `<div class="master-row ${isSel?'selected':''}" id="mrow-${m.id}" ondblclick="toggleMasterSelect(${m.id})" onclick="masterRowClick(${m.id})" title="Double-click to start selecting">
+          return `<div class="master-row ${isSel?'selected':''}" id="mrow-${m.id}" ondblclick="toggleMasterSelect(${m.id})" onclick="masterRowClick(${m.id}, event)" title="Double-click to start selecting">
             <div style="display:flex;align-items:center;gap:8px;">
               <div class="status-dot ${m.status==='Done'?'status-dot-done':'status-dot-todo'}"></div>
               <div><div class="master-row-name">${m.name}</div>${m.checkpoint?`<div style="font-size:10px;color:var(--tx2);">📍 ${m.checkpoint}</div>`:''}</div>
@@ -1797,8 +1844,7 @@ function renderMaster(){
             <span style="font-family:var(--font-mono);font-size:10px;color:var(--tx2);">${m.gws} GWS</span>
             <div style="display:flex;gap:4px;align-items:center;">
               ${nextOcc?`<span class="next-occurrence ${nextOcc.soon?'soon':''}">↻ ${nextOcc.text}</span>`:''}
-              <button class="icon-btn" onclick="shiftGwsMaster(${m.id},-1)" title="Pull back 1 GWS">◀</button>
-              <button class="icon-btn" onclick="shiftGwsMaster(${m.id},1)" title="Push forward 1 GWS">▶</button>
+              <button class="reschedule-btn" onclick="askPush(${m.id})">↷ Reschedule</button>
               <button class="icon-btn edit-btn" onclick="openDetailModal(${m.id})">✎</button>
               <button class="icon-btn del-btn" onclick="deleteMission(${m.id})">×</button>
             </div>
@@ -1830,10 +1876,14 @@ function openNewMissionModal(prefillBattlefront, prefillWarzone){
   document.getElementById('detail-priority').value = 'Critical';
   document.getElementById('detail-date').value = TODAYSTR;
   document.getElementById('detail-time').value = '';
-  document.getElementById('detail-gws-val').textContent = '1 GWS';
+  document.getElementById('detail-gws-select').value = '1';
   document.getElementById('detail-checkpoint').value = '';
   document.getElementById('detail-notes').value = '';
   document.getElementById('detail-status').value = 'To Do';
+  document.getElementById('detail-reschedule-card').style.display = 'none';
+  const tomorrow = new Date(TODAY); tomorrow.setDate(tomorrow.getDate()+1);
+  document.getElementById('dr-date').value = localDateStr(tomorrow);
+  document.getElementById('dr-gws').value = '1';
   document.getElementById('detail-overlay').classList.add('open');
 }
 function closeMissionModal(){document.getElementById('mission-modal').classList.remove('open');editingMissionId=null;}
@@ -1888,11 +1938,92 @@ function openDetailModal(id){
   document.getElementById('detail-priority').value = m.priority;
   document.getElementById('detail-date').value = m.date || '';
   document.getElementById('detail-time').value = m.time || '';
-  document.getElementById('detail-gws-val').textContent = detailGws + ' GWS';
+  document.getElementById('detail-gws-select').value = String(detailGws);
   document.getElementById('detail-checkpoint').value = m.checkpoint || '';
   document.getElementById('detail-notes').value = m.notes || '';
   document.getElementById('detail-status').value = m.status || 'To Do';
+  // Hide reschedule card on open
+  document.getElementById('detail-reschedule-card').style.display = 'none';
+  // Pre-fill reschedule card with current date
+  const tomorrow = new Date(TODAY); tomorrow.setDate(tomorrow.getDate()+1);
+  document.getElementById('dr-date').value = localDateStr(tomorrow);
+  document.getElementById('dr-gws').value = '1';
   document.getElementById('detail-overlay').classList.add('open');
+}
+
+
+function toggleDetailRescheduleCard(){
+  const card = document.getElementById('detail-reschedule-card');
+  const btn = document.getElementById('detail-reschedule-toggle-btn');
+  const isVisible = card.style.display !== 'none';
+  card.style.display = isVisible ? 'none' : 'block';
+  btn.style.background = isVisible ? '' : 'var(--amber)';
+  btn.style.color = isVisible ? '' : 'white';
+}
+
+function applyDetailReschedule(){
+  if(detailMissionId === null) return;
+  const m = state.missions.find(x => x.id === detailMissionId);
+  if(!m) return;
+  const targetDate = document.getElementById('dr-date').value;
+  const targetSlot = parseInt(document.getElementById('dr-gws').value);
+  if(!targetDate){ alert('Please select a date.'); return; }
+
+  const origDate = m.date;
+  const origSlot = getGwsSlot(m.time||autoAssignTime(m)) || 1;
+  const origScore = slotToMinutes(origDate, origSlot);
+  const targetScore = slotToMinutes(targetDate, targetSlot);
+  const slotDelta = targetScore - origScore;
+
+  const cascadeRadio = document.querySelector('input[name="dr-cascade"]:checked');
+  const doCascade = cascadeRadio && cascadeRadio.value === 'yes';
+
+  const toShift = doCascade ? state.missions.filter(x => {
+    if(x.id === detailMissionId || x.status === 'Done') return false;
+    if(x.type === 'Weekly' || x.type === 'Monthly' || x.type === 'Daily') return false;
+    const xSlot = getGwsSlot(x.time||autoAssignTime(x)) || 1;
+    return slotToMinutes(x.date, xSlot) > origScore;
+  }) : [];
+
+  // Check for GWS#4 hits
+  const gws4hits = [];
+  const changes = toShift.map(x => {
+    const xSlot = getGwsSlot(x.time||autoAssignTime(x)) || 1;
+    let newScore = slotToMinutes(x.date, xSlot) + slotDelta;
+    let newDay = Math.floor(newScore / 10);
+    let newSlot = Math.round(newScore % 10);
+    if(newSlot < 1){ newDay--; newSlot = 4; }
+    if(newSlot > 4){ newDay++; newSlot = 1; }
+    newSlot = Math.max(1, Math.min(4, newSlot));
+    const newDate = localDateStr(new Date(newDay * 86400000));
+    if(newSlot === 4) gws4hits.push(x.name);
+    return {mission:x, newSlot, newDate};
+  });
+
+  if(gws4hits.length){
+    document.getElementById('dr-gws4-warn').style.display = 'block';
+  }
+
+  const affected = changes.length;
+  const confirmMsg = affected > 0
+    ? `Move "${m.name}" to ${targetDate} GWS#${targetSlot}?
+
+${affected} task(s) will also shift.${gws4hits.length?' '+gws4hits.length+' will land on GWS#4 (reserved slot) — review after.':''}`
+    : `Move "${m.name}" to ${targetDate} GWS#${targetSlot}?`;
+
+  if(!confirm(confirmMsg)) return;
+
+  m.date = targetDate;
+  m.time = gwsStartTime(targetSlot);
+  m.status = 'To Do';
+  changes.forEach(ch => {
+    ch.mission.date = ch.newDate;
+    ch.mission.time = gwsStartTime(ch.newSlot);
+  });
+
+  save();
+  closeDetailModal();
+  renderDaily(); renderCalendar(); renderMaster();
 }
 
 function closeDetailModal(){
@@ -1918,7 +2049,7 @@ function saveDetailModal(){
     priority: document.getElementById('detail-priority').value,
     date: document.getElementById('detail-date').value || TODAYSTR,
     time: document.getElementById('detail-time').value || '',
-    gws: detailGws,
+    gws: parseInt(document.getElementById('detail-gws-select').value) || 1,
     checkpoint: document.getElementById('detail-checkpoint').value.trim(),
     notes: document.getElementById('detail-notes').value.trim(),
     status: document.getElementById('detail-status').value
@@ -2719,20 +2850,20 @@ setInterval(()=>{
         </select>
       </div>
       <div class="detail-field">
-        <span class="detail-field-label">Date</span>
-        <input type="date" id="detail-date" class="detail-field-value"/>
-      </div>
-      <div class="detail-field">
-        <span class="detail-field-label">Time</span>
-        <input type="time" id="detail-time" class="detail-field-value"/>
+        <span class="detail-field-label">Date &amp; Time</span>
+        <div class="detail-datetime-row">
+          <input type="date" id="detail-date"/>
+          <input type="time" id="detail-time"/>
+        </div>
       </div>
       <div class="detail-field">
         <span class="detail-field-label">GWS</span>
-        <div class="detail-gws-row">
-          <button class="detail-gws-btn" onclick="detailShiftGws(-1)">◀</button>
-          <span class="detail-gws-val" id="detail-gws-val">1 GWS</span>
-          <button class="detail-gws-btn" onclick="detailShiftGws(1)">▶</button>
-        </div>
+        <select id="detail-gws-select" class="detail-field-value">
+          <option value="1">1 GWS — 1.5h</option>
+          <option value="2">2 GWS — 3h</option>
+          <option value="3">3 GWS — 4.5h</option>
+          <option value="4">4 GWS — 6h</option>
+        </select>
       </div>
       <div class="detail-field">
         <span class="detail-field-label">Checkpoint</span>
@@ -2749,9 +2880,34 @@ setInterval(()=>{
           <option value="Done">Done</option>
         </select>
       </div>
+      <!-- RESCHEDULE CARD -->
+      <div class="detail-reschedule-card" id="detail-reschedule-card" style="display:none;">
+        <div class="detail-reschedule-card-title">↷ Reschedule</div>
+        <div class="detail-reschedule-row">
+          <label>New Date</label>
+          <input type="date" id="dr-date"/>
+        </div>
+        <div class="detail-reschedule-row">
+          <label>GWS Slot</label>
+          <select id="dr-gws">
+            <option value="1">GWS #1 — 08:00</option>
+            <option value="2">GWS #2 — 10:00</option>
+            <option value="3">GWS #3 — 13:00</option>
+            <option value="4">GWS #4 — 15:00</option>
+          </select>
+        </div>
+        <div class="detail-reschedule-cascade-toggle">
+          <label><input type="radio" name="dr-cascade" value="yes"> Shift all tasks after this one</label>
+          &nbsp;&nbsp;
+          <label><input type="radio" name="dr-cascade" value="no" checked> Keep other tasks fixed</label>
+        </div>
+        <div id="dr-gws4-warn" style="display:none;font-size:10px;color:#92400E;background:#FEF3C7;border:1px solid #FCD34D;border-radius:4px;padding:5px 8px;margin-bottom:6px;">⚠ One or more tasks will land on GWS #4 (your reserved slot).</div>
+        <button class="detail-reschedule-apply-btn" onclick="applyDetailReschedule()">Apply Reschedule</button>
+      </div>
     </div>
     <div class="detail-footer">
       <button class="btn btn-danger" id="detail-delete-btn" onclick="deleteFromDetail()">Delete</button>
+      <button class="reschedule-btn" onclick="toggleDetailRescheduleCard()" id="detail-reschedule-toggle-btn">↷ Reschedule</button>
       <button class="btn" onclick="closeDetailModal()">Cancel</button>
       <button class="btn btn-primary" onclick="saveDetailModal()">Save</button>
     </div>
