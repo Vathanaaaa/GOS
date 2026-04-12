@@ -612,6 +612,33 @@ body.light-forced .theme-toggle-knob{left:16px;background:var(--amber);}
 .bf-filter-option:hover{background:var(--bg1);}
 .bf-filter-option input[type=checkbox]{width:13px;height:13px;accent-color:var(--blue);cursor:pointer;}
 .bf-filter-btn-active{background:var(--blue-bg)!important;color:var(--blue)!important;border-color:var(--blue)!important;}
+
+/* CONTEXT MENU */
+.ctx-menu{position:fixed;background:var(--bg0);border:1px solid var(--border2);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);z-index:999;min-width:180px;padding:4px 0;display:none;}
+.ctx-menu.open{display:block;}
+.ctx-item{display:flex;align-items:center;gap:10px;padding:7px 14px;font-size:12.5px;color:var(--tx0);cursor:pointer;transition:background 0.1s;user-select:none;}
+.ctx-item:hover{background:var(--bg1);}
+.ctx-item.danger{color:var(--red);}
+.ctx-item.danger:hover{background:var(--red-bg);}
+.ctx-sep{height:1px;background:var(--border);margin:3px 0;}
+.ctx-icon{font-size:13px;width:16px;text-align:center;flex-shrink:0;}
+
+/* STICKY HEADER */
+.master-sticky-header{position:sticky;top:0;z-index:10;background:var(--bg1);border-bottom:2px solid var(--border2);}
+.master-sticky-header .col-header-row{background:var(--bg1);border-bottom:none;}
+
+/* COLUMN CUSTOMISER */
+.col-custom-wrapper{position:relative;}
+.col-custom-btn{display:flex;align-items:center;gap:5px;font-size:11px;padding:4px 10px;}
+.col-custom-panel{display:none;position:absolute;top:calc(100% + 6px);right:0;background:var(--bg0);border:1px solid var(--border2);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);z-index:50;width:220px;padding:0.5rem 0;}
+.col-custom-panel.open{display:block;}
+.col-custom-panel-header{padding:0.4rem 0.75rem 0.25rem;font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:0.06em;font-family:var(--font-mono);}
+.col-custom-item{display:flex;align-items:center;gap:8px;padding:6px 12px;cursor:grab;font-size:12.5px;color:var(--tx0);user-select:none;transition:background 0.1s;}
+.col-custom-item:hover{background:var(--bg1);}
+.col-custom-item.locked{cursor:default;color:var(--tx2);}
+.col-custom-item input[type=checkbox]{width:13px;height:13px;accent-color:var(--blue);cursor:pointer;}
+.col-custom-item .drag-grip{font-size:13px;color:var(--tx3);cursor:grab;}
+.col-custom-item.col-drag-over{border-top:2px solid var(--blue);}
 </style>
 </head>
 <body>
@@ -783,6 +810,13 @@ body.light-forced .theme-toggle-knob{left:16px;background:var(--amber);}
         <div class="master-filter-group">
           <button class="filter-btn active" id="master-view-grouped" onclick="setMasterView('grouped')">Grouped</button>
           <button class="filter-btn" id="master-view-flat" onclick="setMasterView('flat')">Flat</button>
+        </div>
+        <div class="col-custom-wrapper">
+          <button class="btn col-custom-btn" onclick="toggleColPanel()" id="col-custom-btn">⊞ Columns</button>
+          <div class="col-custom-panel" id="col-custom-panel">
+            <div class="col-custom-panel-header">Toggle &amp; drag to reorder</div>
+            <div id="col-custom-list"></div>
+          </div>
         </div>
         <button class="btn btn-primary" onclick="openMissionModal(null)" style="font-size:12px;padding:5px 12px;">+ Mission</button>
       </div>
@@ -1271,7 +1305,10 @@ function buildMissionCard(m,isPushed){
   const nextOccHtml=nextOcc?`<span class="next-occurrence ${nextOcc.soon?'soon':''}">↻ ${nextOcc.text}</span>`:'';
   const currentSlot=getGwsSlot(t)||1;
   const isDailySel = dailySelectedMissions.has(m.id);
-  return `<div class="mission-card ${isDone?'done':''} ${isPushed?'pushed':''} ${isDailySel?'selected':''}" id="mc-${m.id}" ondblclick="toggleDailySelect(${m.id})" title="${dailySelectMode?'Click to select, Shift+click for range':'Double-click to select'}">
+  return `<div class="mission-card ${isDone?'done':''} ${isPushed?'pushed':''} ${isDailySel?'selected':''}" id="mc-${m.id}"
+    oncontextmenu="openCtxMenu(event,${m.id},'daily')"
+    ontouchstart="startLongPress(event,${m.id},'daily')"
+    ontouchend="cancelLongPress()" ontouchmove="cancelLongPress()">
     <div class="mission-check ${isDone?'checked':''}" onclick="event.stopPropagation();toggleMission(${m.id})"></div>
     <div class="mission-info" onclick="event.stopPropagation();dailySelectMode?toggleDailySelect(${m.id},event):openDetailModal(${m.id})" style="cursor:pointer;">
       <div class="mission-top-row">
@@ -1356,6 +1393,7 @@ function shiftGwsMaster(id, direction){
 function toggleMission(id){
   const m=state.missions.find(x=>x.id===id);
   if(!m) return;
+  saveUndo();
   m.status=m.status==='Done'?'To Do':'Done';
   save(); renderDaily(); renderCalendar(); renderMaster();
   // If calendar day modal is open, refresh it
@@ -1365,6 +1403,7 @@ function toggleMission(id){
 }
 function deleteMission(id){
   if(!confirm('Delete this mission?')) return;
+  saveUndo();
   state.missions=state.missions.filter(x=>x.id!==id);
   save(); renderDaily(); renderWarzones(); renderCalendar(); renderMaster();
 }
@@ -1511,6 +1550,7 @@ function previewReschedule(){
 
 function confirmReschedule(){
   if(!reschedulePreviewData) return;
+  saveUndo();
   const {targetDate, targetSlot, cascadeChanges, mission}=reschedulePreviewData;
   const cascadeRadio = document.querySelector('input[name="cascade-choice"]:checked');
   const doCascade = !cascadeRadio || cascadeRadio.value === 'yes';
@@ -1785,6 +1825,7 @@ function bulkDelete(){
   selectedMissions.clear(); save(); renderMaster(); renderDaily(); renderCalendar();
 }
 function bulkEditStatus(status){
+  saveUndo();
   selectedMissions.forEach(id=>{
     const m=state.missions.find(x=>x.id===id);
     if(m) m.status=status;
@@ -1824,6 +1865,7 @@ function applyBulkReschedule(){
   const src = window._bulkRescheduleSource || 'master';
   const ids = src==='daily' ? dailySelectedMissions : selectedMissions;
   if(!confirm(`Move ${ids.size} mission(s) to ${newDate} GWS#${newSlot}?`)) return;
+  saveUndo();
   ids.forEach(id=>{
     const m = state.missions.find(x=>x.id===id);
     if(m){ m.date=newDate; m.time=gwsStartTime(newSlot); m.status='To Do'; }
@@ -1836,6 +1878,63 @@ function applyBulkReschedule(){
 }
 
 
+function buildColGrid(cols){
+  // Build grid-template-columns from active cols
+  const widths = {
+    name:'2fr', type:'90px', priority:'90px', date:'90px', gws:'70px',
+    battlefront:'1fr', warzone:'1fr', checkpoint:'1fr', status:'80px', actions:'auto'
+  };
+  return cols.map(col=>widths[col.key]||'1fr').join(' ');
+}
+
+function buildMasterRow(m, cols, rowClass, isSel){
+  const typeColor=m.type==='One-Time'?'tag-red':m.type==='Daily'?'tag-blue':m.type==='Weekly'?'tag-amber':'tag-green';
+  const prioColor=m.priority==='Critical'?'tag-critical':m.priority==='High'?'tag-amber':'tag-gray';
+  const col=getColors(m.warzone);
+  const cdText=getCountdownText(m);
+  const nextOcc=getNextOccurrenceText(m);
+  const grid = buildColGrid(cols);
+
+  const cells = cols.map(c2=>{
+    switch(c2.key){
+      case 'name': return `<div style="display:flex;align-items:center;gap:8px;min-width:0;">
+        <div class="status-dot ${m.status==='Done'?'status-dot-done':'status-dot-todo'}"></div>
+        <div style="min-width:0;"><div class="master-row-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${m.name}</div>${m.checkpoint?`<div style="font-size:10px;color:var(--tx2);">📍 ${m.checkpoint}</div>`:''}</div>
+      </div>`;
+      case 'type': return `<div style="display:flex;flex-direction:column;gap:3px;"><span class="tag ${typeColor}" style="font-size:10px;">${m.type}</span>${cdText?`<span class="countdown-badge ${cdText==='Due today'?'due-soon':''}">${cdText}</span>`:''}</div>`;
+      case 'priority': return `<span class="tag ${prioColor}" style="font-size:10px;">${m.priority}</span>`;
+      case 'date': return `<span class="master-row-date">${m.date}</span>`;
+      case 'gws': return `<span style="font-family:var(--font-mono);font-size:10px;color:var(--tx2);">${m.gws}G</span>`;
+      case 'battlefront': return `<span style="font-size:11px;color:var(--tx2);">${m.battlefront}</span>`;
+      case 'warzone': return `<span class="tag ${col.wtag}" style="font-size:10px;">${m.warzone.split(' ')[0]}</span>`;
+      case 'checkpoint': return `<span style="font-size:11px;color:var(--tx2);">${m.checkpoint||'—'}</span>`;
+      case 'status': return `<span style="font-size:11px;color:${m.status==='Done'?'var(--green)':'var(--tx2)'};">${m.status}</span>`;
+      case 'actions': return `<div style="display:flex;gap:4px;align-items:center;flex-wrap:nowrap;">
+        ${nextOcc?`<span class="next-occurrence ${nextOcc.soon?'soon':''}">↻ ${nextOcc.text}</span>`:''}
+        <button class="reschedule-btn" onclick="event.stopPropagation();askPush(${m.id})">↷ Reschedule</button>
+        <button class="icon-btn edit-btn" onclick="event.stopPropagation();openDetailModal(${m.id})">✎</button>
+        <button class="icon-btn del-btn" onclick="event.stopPropagation();deleteMission(${m.id})">×</button>
+      </div>`;
+      default: return '<span></span>';
+    }
+  }).join('');
+
+  return `<div class="${rowClass} ${isSel?'selected':''}" id="mrow-${m.id}"
+    style="display:grid;grid-template-columns:${grid};align-items:center;padding:0.55rem 0.875rem;border-bottom:1px solid var(--border);gap:0.75rem;transition:background 0.12s;cursor:pointer;"
+    onclick="masterRowClick(${m.id},event)"
+    oncontextmenu="openCtxMenu(event,${m.id},'master')"
+    ontouchstart="startLongPress(event,${m.id},'master')"
+    ontouchend="cancelLongPress()" ontouchmove="cancelLongPress()">
+    ${cells}
+  </div>`;
+}
+
+function buildColHeaderRow(cols){
+  const grid = buildColGrid(cols);
+  const labels = cols.map(col=>`<span style="font-size:9px;text-transform:uppercase;letter-spacing:0.08em;color:var(--tx3);font-family:var(--font-mono);">${col.label}</span>`).join('');
+  return `<div style="display:grid;grid-template-columns:${grid};padding:0.4rem 0.875rem;gap:0.75rem;border-bottom:1px solid var(--border2);background:var(--bg1);">${labels}</div>`;
+}
+
 function renderMaster(){
   const q=(document.getElementById('master-search').value||'').toLowerCase();
   let missions=state.missions.filter(m=>{
@@ -1846,37 +1945,14 @@ function renderMaster(){
   });
 
   const container=document.getElementById('master-content');
+  const cols = getActiveCols();
 
   if(masterViewMode==='flat'){
     if(!missions.length){container.innerHTML='<div class="empty-state">No missions found.</div>';return;}
     const sorted=[...missions].sort((a,b)=>a.date.localeCompare(b.date));
     container.innerHTML=`<div style="background:var(--bg0);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;">
-      <div class="flat-col-header">
-        <span>Mission</span><span>Warzone</span><span>Battlefront</span><span>Type</span><span>Date</span><span>Actions</span>
-      </div>
-      ${sorted.map(m=>{
-        const col=getColors(m.warzone);
-        const typeColor=m.type==='One-Time'?'tag-red':m.type==='Daily'?'tag-blue':m.type==='Weekly'?'tag-amber':'tag-green';
-        const isSel=selectedMissions.has(m.id);
-        const cdText=getCountdownText(m);
-        const nextOcc=getNextOccurrenceText(m);
-        return `<div class="master-flat-row ${isSel?'selected':''}" id="mrow-${m.id}" ondblclick="toggleMasterSelect(${m.id})" onclick="masterRowClick(${m.id}, event)" title="Double-click to start selecting">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <div class="status-dot ${m.status==='Done'?'status-dot-done':'status-dot-todo'}"></div>
-            <div><div style="font-size:12.5px;font-weight:500;">${m.name}</div>${m.notes?`<div style="font-size:10px;color:var(--tx2);margin-top:2px;">${m.notes.substring(0,60)}${m.notes.length>60?'…':''}</div>`:''}</div>
-          </div>
-          <span class="tag ${col.wtag}" style="font-size:10px;">${m.warzone.split(' ')[0]}</span>
-          <span style="font-size:11px;color:var(--tx2);">${m.battlefront}</span>
-          <div style="display:flex;flex-direction:column;gap:3px;"><span class="tag ${typeColor}" style="font-size:10px;">${m.type}</span>${cdText?`<span class="countdown-badge ${cdText==='Due today'?'due-soon':''}">${cdText}</span>`:''}</div>
-          <span style="font-family:var(--font-mono);font-size:10px;color:var(--tx2);">${m.date}</span>
-          <div style="display:flex;gap:4px;align-items:center;">
-            ${nextOcc?`<span class="next-occurrence ${nextOcc.soon?'soon':''}">↻ ${nextOcc.text}</span>`:''}
-            <button class="reschedule-btn" onclick="askPush(${m.id})">↷ Reschedule</button>
-            <button class="icon-btn edit-btn" onclick="openDetailModal(${m.id})">✎</button>
-            <button class="icon-btn del-btn" onclick="deleteMission(${m.id})">×</button>
-          </div>
-        </div>`;
-      }).join('')}
+      <div class="master-sticky-header">${buildColHeaderRow(cols)}</div>
+      ${sorted.map(m=>buildMasterRow(m,cols,'master-flat-row',selectedMissions.has(m.id))).join('')}
     </div>`;
     return;
   }
@@ -1897,31 +1973,9 @@ function renderMaster(){
         <span class="master-section-title"><span class="tag ${col.wtag}">${g.warzone}</span> &nbsp;${g.battlefront}</span>
         <span style="font-size:10px;font-family:var(--font-mono);color:var(--tx2);">${g.missions.length} missions</span>
       </div>
-      <div class="master-section-body">
-        <div class="col-header-row"><span>Mission</span><span>Type</span><span>Priority</span><span>Date</span><span>GWS</span><span>Actions</span></div>
-        ${sorted.map(m=>{
-          const typeColor=m.type==='One-Time'?'tag-red':m.type==='Daily'?'tag-blue':m.type==='Weekly'?'tag-amber':'tag-green';
-          const prioColor=m.priority==='Critical'?'tag-critical':m.priority==='High'?'tag-amber':'tag-gray';
-          const isSel=selectedMissions.has(m.id);
-          const cdText=getCountdownText(m);
-          const nextOcc=getNextOccurrenceText(m);
-          return `<div class="master-row ${isSel?'selected':''}" id="mrow-${m.id}" ondblclick="toggleMasterSelect(${m.id})" onclick="masterRowClick(${m.id}, event)" title="Double-click to start selecting">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <div class="status-dot ${m.status==='Done'?'status-dot-done':'status-dot-todo'}"></div>
-              <div><div class="master-row-name">${m.name}</div>${m.checkpoint?`<div style="font-size:10px;color:var(--tx2);">📍 ${m.checkpoint}</div>`:''}</div>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:3px;"><span class="tag ${typeColor}" style="font-size:10px;">${m.type}</span>${cdText?`<span class="countdown-badge ${cdText==='Due today'?'due-soon':''}">${cdText}</span>`:''}</div>
-            <span class="tag ${prioColor}" style="font-size:10px;">${m.priority}</span>
-            <span class="master-row-date">${m.date}</span>
-            <span style="font-family:var(--font-mono);font-size:10px;color:var(--tx2);">${m.gws} GWS</span>
-            <div style="display:flex;gap:4px;align-items:center;">
-              ${nextOcc?`<span class="next-occurrence ${nextOcc.soon?'soon':''}">↻ ${nextOcc.text}</span>`:''}
-              <button class="reschedule-btn" onclick="askPush(${m.id})">↷ Reschedule</button>
-              <button class="icon-btn edit-btn" onclick="openDetailModal(${m.id})">✎</button>
-              <button class="icon-btn del-btn" onclick="deleteMission(${m.id})">×</button>
-            </div>
-          </div>`;
-        }).join('')}
+      <div class="master-section-body" style="overflow:visible;">
+        <div class="master-sticky-header">${buildColHeaderRow(cols)}</div>
+        ${sorted.map(m=>buildMasterRow(m,cols,'master-row',selectedMissions.has(m.id))).join('')}
       </div>
     </div>`;
   }).join('');
@@ -2084,7 +2138,7 @@ ${affected} task(s) will also shift.${gws4hits.length?' '+gws4hits.length+' will
     : `Move "${m.name}" to ${targetDate} GWS#${targetSlot}?`;
 
   if(!confirm(confirmMsg)) return;
-
+  saveUndo();
   m.date = targetDate;
   m.time = gwsStartTime(targetSlot);
   m.status = 'To Do';
@@ -2128,6 +2182,7 @@ function saveDetailModal(){
   };
   if(detailMissionId !== null){
     // Edit existing
+    saveUndo();
     const m = state.missions.find(x => x.id === detailMissionId);
     if(!m) return;
     Object.assign(m, {...data, status: data.status});
@@ -2144,6 +2199,7 @@ function saveDetailModal(){
 function deleteFromDetail(){
   if(detailMissionId === null) return;
   if(!confirm('Delete this mission?')) return;
+  saveUndo();
   state.missions = state.missions.filter(x => x.id !== detailMissionId);
   save(); closeDetailModal(); renderDaily(); renderWarzones(); renderMaster(); renderCalendar();
 }
@@ -2978,6 +3034,253 @@ function bulkDailyReschedule(){
   window._bulkRescheduleSource = 'daily';
   document.getElementById('bulk-reschedule-overlay').classList.add('open');
 }
+
+// ════════════════════════════════════════════
+// UNDO / REDO  (session only, max 20 steps)
+// ════════════════════════════════════════════
+const UNDO_MAX = 20;
+let undoStack = [];
+let redoStack = [];
+
+function saveUndo(){
+  undoStack.push(JSON.stringify(state));
+  if(undoStack.length > UNDO_MAX) undoStack.shift();
+  redoStack = []; // new action clears redo
+}
+
+function undo(){
+  if(!undoStack.length) return;
+  redoStack.push(JSON.stringify(state));
+  state = JSON.parse(undoStack.pop());
+  save(); renderAll();
+}
+
+function redo(){
+  if(!redoStack.length) return;
+  undoStack.push(JSON.stringify(state));
+  state = JSON.parse(redoStack.pop());
+  save(); renderAll();
+}
+
+function renderAll(){
+  renderDaily(); renderWarzones(); renderMaster(); renderCalendar();
+}
+
+document.addEventListener('keydown', function(e){
+  // Ctrl+Z = undo, Ctrl+Shift+Z = redo
+  if(e.ctrlKey && e.key === 'z' && !e.shiftKey){
+    const active = document.activeElement;
+    if(active && (active.tagName==='INPUT'||active.tagName==='TEXTAREA'||active.isContentEditable)) return;
+    e.preventDefault(); undo();
+  }
+  if(e.ctrlKey && e.shiftKey && e.key === 'Z'){
+    e.preventDefault(); redo();
+  }
+  // Escape exits select mode
+  if(e.key === 'Escape'){
+    if(masterSelectMode){ masterSelectMode=false; selectedMissions.clear(); updateBulkBar(); renderMaster(); }
+    if(dailySelectMode){ cancelDailySelect(); }
+    closeCtxMenu();
+  }
+});
+
+// ════════════════════════════════════════════
+// CONTEXT MENU
+// ════════════════════════════════════════════
+let ctxTargetId = null;
+let ctxSource = null; // 'daily' | 'master'
+let ctxLongPressTimer = null;
+
+function openCtxMenu(e, id, source){
+  e.preventDefault();
+  ctxTargetId = id;
+  ctxSource = source;
+  const m = state.missions.find(x=>x.id===id);
+  if(!m) return;
+
+  // Update dynamic labels
+  document.getElementById('ctx-status').innerHTML =
+    m.status==='Done'
+      ? '<span class="ctx-icon">↩</span> Mark To Do'
+      : '<span class="ctx-icon">✓</span> Mark Done';
+
+  const isSelected = source==='daily' ? dailySelectedMissions.has(id) : selectedMissions.has(id);
+  document.getElementById('ctx-select').innerHTML =
+    isSelected
+      ? '<span class="ctx-icon">☑</span> Deselect'
+      : '<span class="ctx-icon">☐</span> Select';
+
+  const menu = document.getElementById('ctx-menu');
+  menu.classList.add('open');
+
+  // Position: keep within viewport
+  const vw = window.innerWidth, vh = window.innerHeight;
+  let x = e.clientX || (e.touches && e.touches[0].clientX) || 0;
+  let y = e.clientY || (e.touches && e.touches[0].clientY) || 0;
+  menu.style.left = (x + menu.offsetWidth > vw ? vw - menu.offsetWidth - 8 : x) + 'px';
+  menu.style.top  = (y + menu.offsetHeight > vh ? vh - menu.offsetHeight - 8 : y) + 'px';
+}
+
+function closeCtxMenu(){
+  document.getElementById('ctx-menu').classList.remove('open');
+  ctxTargetId = null;
+}
+
+function ctxAction(action){
+  const id = ctxTargetId;
+  closeCtxMenu();
+  if(!id) return;
+  const m = state.missions.find(x=>x.id===id);
+  if(!m) return;
+
+  if(action === 'open'){
+    openDetailModal(id);
+  } else if(action === 'select'){
+    if(ctxSource === 'daily'){
+      if(dailySelectedMissions.has(id)) dailySelectedMissions.delete(id);
+      else { dailySelectMode=true; dailySelectedMissions.add(id); }
+      lastSelectedId = id;
+      updateDailyBulkBar(); renderDaily();
+    } else {
+      if(selectedMissions.has(id)) selectedMissions.delete(id);
+      else { masterSelectMode=true; selectedMissions.add(id); }
+      lastSelectedId = id;
+      updateBulkBar(); renderMaster();
+    }
+  } else if(action === 'status'){
+    saveUndo();
+    m.status = m.status==='Done' ? 'To Do' : 'Done';
+    save(); renderAll();
+    if(calDayModalDate && document.getElementById('cal-day-modal').classList.contains('open')) openCalDayModal(calDayModalDate);
+  } else if(action === 'reschedule'){
+    askPush(id);
+  } else if(action === 'delete'){
+    saveUndo();
+    if(!confirm('Delete "'+m.name+'"?')) return;
+    state.missions = state.missions.filter(x=>x.id!==id);
+    save(); renderAll();
+  }
+}
+
+// Close context menu on outside click or scroll
+document.addEventListener('click', function(e){
+  if(!e.target.closest('#ctx-menu') && !e.target.closest('.ctx-menu')) closeCtxMenu();
+});
+document.addEventListener('scroll', closeCtxMenu, true);
+
+// Long-press helpers (touch)
+function startLongPress(e, id, source){
+  ctxLongPressTimer = setTimeout(()=>{
+    const touch = e.touches[0];
+    openCtxMenu({
+      preventDefault:()=>{},
+      clientX: touch.clientX,
+      clientY: touch.clientY
+    }, id, source);
+  }, 500);
+}
+function cancelLongPress(){ clearTimeout(ctxLongPressTimer); }
+
+// ════════════════════════════════════════════
+// COLUMN CUSTOMISER
+// ════════════════════════════════════════════
+const COL_DEFS = [
+  {key:'name',     label:'Mission',    locked:true,  defaultOn:true},
+  {key:'type',     label:'Type',       locked:false, defaultOn:true},
+  {key:'priority', label:'Priority',   locked:false, defaultOn:true},
+  {key:'date',     label:'Date',       locked:false, defaultOn:true},
+  {key:'gws',      label:'GWS',        locked:false, defaultOn:true},
+  {key:'battlefront',label:'Battlefront',locked:false,defaultOn:false},
+  {key:'warzone',  label:'Warzone',    locked:false, defaultOn:false},
+  {key:'checkpoint',label:'Checkpoint',locked:false, defaultOn:false},
+  {key:'status',   label:'Status',     locked:false, defaultOn:false},
+  {key:'actions',  label:'Actions',    locked:true,  defaultOn:true},
+];
+
+function getColPrefs(){
+  if(!sessionStorage.getItem('gos_cols')){
+    const prefs = COL_DEFS.map(d=>({key:d.key,on:d.defaultOn}));
+    sessionStorage.setItem('gos_cols', JSON.stringify(prefs));
+  }
+  return JSON.parse(sessionStorage.getItem('gos_cols'));
+}
+
+function saveColPrefs(prefs){
+  sessionStorage.setItem('gos_cols', JSON.stringify(prefs));
+}
+
+function getActiveCols(){
+  const prefs = getColPrefs();
+  return prefs.filter(p=>p.on).map(p=>COL_DEFS.find(d=>d.key===p.key)).filter(Boolean);
+}
+
+function toggleColPanel(){
+  const panel = document.getElementById('col-custom-panel');
+  if(panel.classList.contains('open')){ panel.classList.remove('open'); return; }
+  renderColPanel();
+  panel.classList.add('open');
+}
+
+let colDragSrc = null;
+function renderColPanel(){
+  const prefs = getColPrefs();
+  const list = document.getElementById('col-custom-list');
+  list.innerHTML = prefs.map((p,i)=>{
+    const def = COL_DEFS.find(d=>d.key===p.key);
+    if(!def) return '';
+    return `<div class="col-custom-item ${def.locked?'locked':''}" data-col-idx="${i}"
+      draggable="${!def.locked}"
+      ondragstart="colDragStart(event,${i})"
+      ondragover="colDragOver(event,${i})"
+      ondrop="colDrop(event,${i})"
+      ondragleave="colDragLeave(event)">
+      <span class="drag-grip">${def.locked?'·':'⠿'}</span>
+      <input type="checkbox" ${p.on?'checked':''} ${def.locked?'disabled':''} onchange="toggleCol('${p.key}',this.checked)">
+      <span>${def.label}</span>
+    </div>`;
+  }).join('');
+}
+
+function toggleCol(key, on){
+  const prefs = getColPrefs();
+  const p = prefs.find(x=>x.key===key);
+  if(p) p.on = on;
+  saveColPrefs(prefs);
+  renderMaster();
+}
+
+function colDragStart(e, idx){ colDragSrc=idx; e.dataTransfer.effectAllowed='move'; }
+function colDragOver(e, idx){
+  e.preventDefault();
+  document.querySelectorAll('.col-custom-item').forEach(el=>el.classList.remove('col-drag-over'));
+  const items = document.querySelectorAll('.col-custom-item');
+  if(items[idx]) items[idx].classList.add('col-drag-over');
+}
+function colDragLeave(e){ e.currentTarget.classList.remove('col-drag-over'); }
+function colDrop(e, idx){
+  e.preventDefault();
+  document.querySelectorAll('.col-custom-item').forEach(el=>el.classList.remove('col-drag-over'));
+  if(colDragSrc===null||colDragSrc===idx) return;
+  const prefs = getColPrefs();
+  // Don't allow moving locked cols
+  const srcDef = COL_DEFS.find(d=>d.key===prefs[colDragSrc].key);
+  const tgtDef = COL_DEFS.find(d=>d.key===prefs[idx].key);
+  if(srcDef&&srcDef.locked) return;
+  if(tgtDef&&tgtDef.locked) return;
+  const [moved] = prefs.splice(colDragSrc,1);
+  prefs.splice(idx,0,moved);
+  saveColPrefs(prefs);
+  renderColPanel();
+  renderMaster();
+  colDragSrc=null;
+}
+
+// Close col panel on outside click
+document.addEventListener('click', function(e){
+  const panel = document.getElementById('col-custom-panel');
+  if(panel && panel.classList.contains('open') && !e.target.closest('.col-custom-wrapper')) panel.classList.remove('open');
+});
+
 // ── INIT ──
 document.getElementById('date-display').textContent=TODAY.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
 document.getElementById('streak-display').textContent='🔥 Day '+state.streak;
@@ -3102,6 +3405,18 @@ setInterval(()=>{
   </div>
 </div>
 
+
+
+<!-- CONTEXT MENU -->
+<div class="ctx-menu" id="ctx-menu">
+  <div class="ctx-item" id="ctx-open" onclick="ctxAction('open')"><span class="ctx-icon">↗</span> Open</div>
+  <div class="ctx-item" id="ctx-select" onclick="ctxAction('select')"><span class="ctx-icon">☐</span> Select</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item" id="ctx-status" onclick="ctxAction('status')"><span class="ctx-icon">✓</span> Mark Done</div>
+  <div class="ctx-item" onclick="ctxAction('reschedule')"><span class="ctx-icon">↷</span> Reschedule</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item danger" onclick="ctxAction('delete')"><span class="ctx-icon">×</span> Delete</div>
+</div>
 
 <!-- BULK RESCHEDULE MODAL -->
 <div class="detail-overlay" id="bulk-reschedule-overlay" onclick="if(event.target===this)closeBulkReschedule()">
