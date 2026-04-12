@@ -285,7 +285,7 @@ body{font-family:var(--font-body);background:var(--bg1);color:var(--tx0);min-hei
 .master-section-header:first-child{margin-top:0;}
 .master-section-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;font-family:var(--font-mono);}
 .master-section-body{border:1px solid var(--border);border-top:none;border-radius:0 0 var(--radius) var(--radius);overflow:hidden;}
-.master-row{display:grid;grid-template-columns:2fr 1fr 1fr 70px 60px 70px;align-items:center;padding:0.6rem 0.875rem;border-bottom:1px solid var(--border);gap:0.75rem;transition:background 0.12s;}
+.master-row{display:grid;grid-template-columns:2fr 1fr 1fr 70px 60px auto;align-items:center;padding:0.6rem 0.875rem;border-bottom:1px solid var(--border);gap:0.75rem;transition:background 0.12s;}
 .master-row:last-child{border-bottom:none;}
 .master-row:hover{background:var(--bg1);}
 .master-row-name{font-size:12.5px;font-weight:500;}
@@ -293,7 +293,7 @@ body{font-family:var(--font-body);background:var(--bg1);color:var(--tx0);min-hei
 .master-row-date{font-family:var(--font-mono);font-size:10px;color:var(--tx2);}
 .master-row-type{font-size:10px;}
 .master-row-actions{display:flex;gap:4px;}
-.master-flat-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 70px 70px;align-items:center;padding:0.6rem 0.875rem;border-bottom:1px solid var(--border);gap:0.75rem;transition:background 0.12s;}
+.master-flat-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 70px auto;align-items:center;padding:0.6rem 0.875rem;border-bottom:1px solid var(--border);gap:0.75rem;transition:background 0.12s;}
 .master-flat-row:last-child{border-bottom:none;}
 .master-flat-row:hover{background:var(--bg1);}
 .col-header-row{display:grid;grid-template-columns:2fr 1fr 1fr 70px 60px 70px;padding:0.4rem 0.875rem;gap:0.75rem;border-bottom:1px solid var(--border2);background:var(--bg1);}
@@ -600,6 +600,18 @@ body.light-forced .theme-toggle-knob{left:16px;background:var(--amber);}
 .h48-drag-handle{color:var(--tx3);font-size:12px;opacity:0;transition:opacity 0.12s;cursor:grab;margin-right:4px;}
 .h48-section:hover .h48-drag-handle{opacity:1;}
 
+
+/* BATTLEFRONT FILTER PANEL */
+.bf-filter-wrapper{position:relative;}
+.bf-filter-panel{display:none;position:absolute;top:calc(100% + 6px);left:0;background:var(--bg0);border:1px solid var(--border2);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);z-index:50;min-width:220px;padding:0.5rem 0;}
+.bf-filter-panel.open{display:block;}
+.bf-filter-panel-header{padding:0.4rem 0.75rem 0.25rem;font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:0.06em;font-family:var(--font-mono);display:flex;justify-content:space-between;align-items:center;}
+.bf-filter-panel-header button{font-size:10px;color:var(--tx3);background:none;border:none;cursor:pointer;font-family:var(--font-body);}
+.bf-filter-panel-header button:hover{color:var(--tx0);}
+.bf-filter-option{display:flex;align-items:center;gap:8px;padding:0.35rem 0.75rem;cursor:pointer;font-size:12.5px;color:var(--tx0);transition:background 0.1s;}
+.bf-filter-option:hover{background:var(--bg1);}
+.bf-filter-option input[type=checkbox]{width:13px;height:13px;accent-color:var(--blue);cursor:pointer;}
+.bf-filter-btn-active{background:var(--blue-bg)!important;color:var(--blue)!important;border-color:var(--blue)!important;}
 </style>
 </head>
 <body>
@@ -720,6 +732,12 @@ body.light-forced .theme-toggle-knob{left:16px;background:var(--amber);}
       </div>
       <div id="daily-list"></div>
       <div id="pushed-section"></div>
+      <!-- Daily bulk bar -->
+      <div id="daily-bulk-bar" style="display:none;position:sticky;bottom:0;z-index:20;background:var(--blue);color:white;padding:0.5rem 1rem;border-radius:var(--radius);margin-top:0.75rem;align-items:center;gap:10px;font-size:12px;box-shadow:0 2px 8px rgba(37,99,235,0.35);">
+        <span id="daily-bulk-count">0 selected</span>
+        <button class="master-bulk-btn" onclick="bulkDailyReschedule()">↷ Reschedule</button>
+        <button class="master-bulk-btn" onclick="cancelDailySelect()">Cancel</button>
+      </div>
     </div>
 
     <!-- WARZONES VIEW -->
@@ -740,7 +758,7 @@ body.light-forced .theme-toggle-knob{left:16px;background:var(--amber);}
         <span id="bulk-count">0 selected</span>
         <button class="master-bulk-btn" onclick="bulkEditStatus('Done')">Mark Done</button>
         <button class="master-bulk-btn" onclick="bulkEditStatus('To Do')">Mark To Do</button>
-        <button class="master-bulk-btn" onclick="bulkEditDate()">Change Date</button>
+        <button class="master-bulk-btn" onclick="openBulkReschedule()">↷ Reschedule</button>
         <button class="master-bulk-btn danger" onclick="bulkDelete()">Delete All</button>
         <button class="master-bulk-btn" onclick="masterSelectMode=false;selectedMissions.clear();updateBulkBar();renderMaster()">Cancel</button>
       </div>
@@ -751,6 +769,16 @@ body.light-forced .theme-toggle-knob{left:16px;background:var(--amber);}
           <button class="filter-btn" data-wz="Money Making" onclick="setMasterWz('Money Making')">💰 Money</button>
           <button class="filter-btn" data-wz="Self-Improvement" onclick="setMasterWz('Self-Improvement')">🧠 Self</button>
           <button class="filter-btn" data-wz="Family & Relationship" onclick="setMasterWz('Family & Relationship')">💚 Family</button>
+        </div>
+        <div class="bf-filter-wrapper">
+          <button class="filter-btn" id="bf-filter-btn" onclick="toggleBfFilterPanel()">⊟ Filter</button>
+          <div class="bf-filter-panel" id="bf-filter-panel">
+            <div class="bf-filter-panel-header">
+              <span>Battlefront</span>
+              <button onclick="clearBfFilter()">Clear</button>
+            </div>
+            <div id="bf-filter-options"></div>
+          </div>
         </div>
         <div class="master-filter-group">
           <button class="filter-btn active" id="master-view-grouped" onclick="setMasterView('grouped')">Grouped</button>
@@ -913,6 +941,8 @@ let editingMissionId = null;
 let pendingPushId = null;
 let selectedMissions = new Set();
 let lastSelectedId = null;
+let dailySelectMode = false;
+let dailySelectedMissions = new Set();
 let calDayModalDate = null;
 let editingVisionIdx = null;
 let editingOodaId = null;
@@ -1240,9 +1270,10 @@ function buildMissionCard(m,isPushed){
   const nextOcc=getNextOccurrenceText(m);
   const nextOccHtml=nextOcc?`<span class="next-occurrence ${nextOcc.soon?'soon':''}">↻ ${nextOcc.text}</span>`:'';
   const currentSlot=getGwsSlot(t)||1;
-  return `<div class="mission-card ${isDone?'done':''} ${isPushed?'pushed':''}" id="mc-${m.id}">
-    <div class="mission-check ${isDone?'checked':''}" onclick="toggleMission(${m.id})"></div>
-    <div class="mission-info" onclick="openDetailModal(${m.id})" style="cursor:pointer;">
+  const isDailySel = dailySelectedMissions.has(m.id);
+  return `<div class="mission-card ${isDone?'done':''} ${isPushed?'pushed':''} ${isDailySel?'selected':''}" id="mc-${m.id}" ondblclick="toggleDailySelect(${m.id})" title="${dailySelectMode?'Click to select, Shift+click for range':'Double-click to select'}">
+    <div class="mission-check ${isDone?'checked':''}" onclick="event.stopPropagation();toggleMission(${m.id})"></div>
+    <div class="mission-info" onclick="event.stopPropagation();dailySelectMode?toggleDailySelect(${m.id},event):openDetailModal(${m.id})" style="cursor:pointer;">
       <div class="mission-top-row">
         <span class="mission-time-compact">${formatTime(t)}</span>
         <span class="mission-name ${isDone?'done':''}">${m.name}</span>
@@ -1326,7 +1357,11 @@ function toggleMission(id){
   const m=state.missions.find(x=>x.id===id);
   if(!m) return;
   m.status=m.status==='Done'?'To Do':'Done';
-  save(); renderDaily(); renderCalendar();
+  save(); renderDaily(); renderCalendar(); renderMaster();
+  // If calendar day modal is open, refresh it
+  if(calDayModalDate && document.getElementById('cal-day-modal').classList.contains('open')){
+    openCalDayModal(calDayModalDate);
+  }
 }
 function deleteMission(id){
   if(!confirm('Delete this mission?')) return;
@@ -1729,7 +1764,10 @@ function toggleMasterSelect(id, shiftHeld){
   updateBulkBar();
 }
 function masterRowClick(id, event){
-  if(masterSelectMode) toggleMasterSelect(id, event && event.shiftKey);
+  if(masterSelectMode){ toggleMasterSelect(id, event && event.shiftKey); return; }
+  // Normal mode: open detail modal unless a button was clicked
+  if(event && event.target.closest('button')) return;
+  openDetailModal(id);
 }
 function updateBulkBar(){
   const bar=document.getElementById('master-bulk-bar');
@@ -1764,11 +1802,45 @@ function bulkEditDate(){
   selectedMissions.clear(); save(); renderMaster(); renderDaily(); renderCalendar();
   updateBulkBar();
 }
+function openBulkReschedule(){
+  if(!selectedMissions.size){ alert('No missions selected.'); return; }
+  const tomorrow = new Date(TODAY); tomorrow.setDate(tomorrow.getDate()+1);
+  document.getElementById('bulk-r-date').value = localDateStr(tomorrow);
+  document.getElementById('bulk-r-gws').value = '1';
+  document.getElementById('bulk-r-gws4-warn').style.display = 'none';
+  document.getElementById('bulk-r-count').textContent = selectedMissions.size + ' mission(s) will be moved.';
+  document.getElementById('bulk-r-gws').onchange = function(){
+    document.getElementById('bulk-r-gws4-warn').style.display = this.value === '4' ? 'block' : 'none';
+  };
+  document.getElementById('bulk-reschedule-overlay').classList.add('open');
+}
+function closeBulkReschedule(){
+  document.getElementById('bulk-reschedule-overlay').classList.remove('open');
+}
+function applyBulkReschedule(){
+  const newDate = document.getElementById('bulk-r-date').value;
+  const newSlot = parseInt(document.getElementById('bulk-r-gws').value);
+  if(!newDate){ alert('Please select a date.'); return; }
+  const src = window._bulkRescheduleSource || 'master';
+  const ids = src==='daily' ? dailySelectedMissions : selectedMissions;
+  if(!confirm(`Move ${ids.size} mission(s) to ${newDate} GWS#${newSlot}?`)) return;
+  ids.forEach(id=>{
+    const m = state.missions.find(x=>x.id===id);
+    if(m){ m.date=newDate; m.time=gwsStartTime(newSlot); m.status='To Do'; }
+  });
+  ids.clear();
+  if(src==='daily'){ dailySelectMode=false; updateDailyBulkBar(); }
+  else { masterSelectMode=false; updateBulkBar(); }
+  window._bulkRescheduleSource='master';
+  save(); closeBulkReschedule(); renderDaily(); renderCalendar(); renderMaster();
+}
+
 
 function renderMaster(){
   const q=(document.getElementById('master-search').value||'').toLowerCase();
   let missions=state.missions.filter(m=>{
     if(masterWzFilter!=='all'&&m.warzone!==masterWzFilter) return false;
+    if(masterBfFilter.size>0&&!masterBfFilter.has(m.battlefront)) return false;
     if(q&&!m.name.toLowerCase().includes(q)&&!m.battlefront.toLowerCase().includes(q)) return false;
     return true;
   });
@@ -2248,9 +2320,9 @@ function renderVision(){
         ${(state.visionTargets||[]).map((t,i)=>`
           <div class="vision-target-card">
             <div class="vision-target-card-header">
-              <span class="vision-target-bf">${t.label||'Target '+(i+1)}</span>
+              <input class="vision-target-label-input" value="${t.label||'Target '+(i+1)}" onblur="saveProximateTarget(${i},'label',this.value)" placeholder="Target name..." style="font-size:12px;font-weight:600;color:var(--tx0);border:none;background:transparent;outline:none;flex:1;padding:2px 4px;border-radius:3px;cursor:text;" onfocus="this.style.background='var(--blue-bg)'" onblur2="this.style.background='transparent'" />
               <div style="display:flex;align-items:center;gap:6px;">
-                <span class="vision-target-deadline">${t.deadline||''}</span>
+                <input type="date" class="vision-target-date-input" value="${t.deadline||''}" onchange="saveProximateTarget(${i},'deadline',this.value)" style="font-family:var(--font-mono);font-size:10px;color:var(--tx2);border:none;background:transparent;outline:none;cursor:pointer;padding:2px 4px;border-radius:3px;" onfocus="this.style.background='var(--bg2)'" onblur="this.style.background='transparent'" />
                 <button class="icon-btn del-btn" onclick="deleteProximateTarget(${i})" style="font-size:10px;">×</button>
               </div>
             </div>
@@ -2747,6 +2819,18 @@ function navDrop(e){
   if(srcIdx<tgtIdx) parent.insertBefore(navDragSrc,target.nextSibling);
   else parent.insertBefore(navDragSrc,target);
   navDragSrc=null;
+  // Save new order to state
+  const newOrder=[...parent.querySelectorAll('.nav-item[draggable]')].map(el=>el.dataset.view);
+  state.navOrder=newOrder; save();
+}
+
+function restoreNavOrder(){
+  if(!state.navOrder||!state.navOrder.length) return;
+  const parent=document.getElementById('nav-daily').parentNode;
+  state.navOrder.forEach(view=>{
+    const el=document.getElementById('nav-'+view);
+    if(el) parent.appendChild(el);
+  });
 }
 
 // ── 48H MISSION PICKER ──
@@ -2791,6 +2875,109 @@ function clearH48Slot(i){
   save(); renderVision();
 }
 
+
+
+// ── BATTLEFRONT FILTER ──
+let masterBfFilter = new Set(); // empty = show all
+
+function toggleBfFilterPanel(){
+  const panel = document.getElementById('bf-filter-panel');
+  const isOpen = panel.classList.contains('open');
+  // Close on second click
+  if(isOpen){ panel.classList.remove('open'); return; }
+  // Populate options from all unique battlefronts
+  const bfs = [...new Set(state.missions.map(m=>m.battlefront).filter(Boolean))].sort();
+  document.getElementById('bf-filter-options').innerHTML = bfs.map(bf=>`
+    <label class="bf-filter-option">
+      <input type="checkbox" ${masterBfFilter.has(bf)?'checked':''} onchange="toggleBfOption('${bf.replace(/'/g,"\'")}',this.checked)">
+      <span>${bf}</span>
+    </label>`).join('');
+  panel.classList.add('open');
+}
+
+function toggleBfOption(bf, checked){
+  if(checked) masterBfFilter.add(bf);
+  else masterBfFilter.delete(bf);
+  // Update filter button style
+  const btn = document.getElementById('bf-filter-btn');
+  if(masterBfFilter.size > 0){
+    btn.textContent = '⊟ Filter ('+masterBfFilter.size+')';
+    btn.classList.add('bf-filter-btn-active');
+  } else {
+    btn.textContent = '⊟ Filter';
+    btn.classList.remove('bf-filter-btn-active');
+  }
+  renderMaster();
+}
+
+function clearBfFilter(){
+  masterBfFilter.clear();
+  document.getElementById('bf-filter-btn').textContent = '⊟ Filter';
+  document.getElementById('bf-filter-btn').classList.remove('bf-filter-btn-active');
+  document.querySelectorAll('#bf-filter-options input[type=checkbox]').forEach(cb=>cb.checked=false);
+  renderMaster();
+}
+
+// Close filter panel when clicking outside
+document.addEventListener('click', function(e){
+  const panel = document.getElementById('bf-filter-panel');
+  if(panel && panel.classList.contains('open')){
+    if(!e.target.closest('.bf-filter-wrapper')) panel.classList.remove('open');
+  }
+});
+
+// ── DAILY CHECKLIST SELECT MODE ──
+function toggleDailySelect(id, event){
+  if(!dailySelectMode){ dailySelectMode=true; }
+  if(event && event.shiftKey && lastSelectedId !== null && lastSelectedId !== id){
+    const allCards = Array.from(document.querySelectorAll('[id^="mc-"]'));
+    const ids = allCards.map(el=>parseInt(el.id.replace('mc-','')));
+    const fromIdx = ids.indexOf(lastSelectedId);
+    const toIdx = ids.indexOf(id);
+    if(fromIdx !== -1 && toIdx !== -1){
+      const lo=Math.min(fromIdx,toIdx), hi=Math.max(fromIdx,toIdx);
+      ids.slice(lo,hi+1).forEach(rid=>{ dailySelectedMissions.add(rid); });
+    }
+  } else {
+    if(dailySelectedMissions.has(id)) dailySelectedMissions.delete(id);
+    else dailySelectedMissions.add(id);
+  }
+  lastSelectedId = id;
+  updateDailyBulkBar();
+  renderDaily();
+}
+
+function updateDailyBulkBar(){
+  const bar = document.getElementById('daily-bulk-bar');
+  if(!bar) return;
+  const count = dailySelectedMissions.size;
+  if(count > 0){
+    bar.style.display='flex';
+    document.getElementById('daily-bulk-count').textContent = count+' selected';
+  } else {
+    bar.style.display='none';
+    dailySelectMode=false;
+  }
+}
+
+function cancelDailySelect(){
+  dailySelectedMissions.clear(); dailySelectMode=false; updateDailyBulkBar(); renderDaily();
+}
+
+function bulkDailyReschedule(){
+  if(!dailySelectedMissions.size) return;
+  const tomorrow = new Date(TODAY); tomorrow.setDate(tomorrow.getDate()+1);
+  document.getElementById('bulk-r-date').value = localDateStr(tomorrow);
+  document.getElementById('bulk-r-gws').value = '1';
+  document.getElementById('bulk-r-gws4-warn').style.display='none';
+  document.getElementById('bulk-r-count').textContent = dailySelectedMissions.size+' mission(s) will be moved.';
+  document.getElementById('bulk-r-gws').onchange = function(){
+    document.getElementById('bulk-r-gws4-warn').style.display = this.value==='4'?'block':'none';
+  };
+  // Override apply to use daily selection
+  window._bulkRescheduleSource = 'daily';
+  document.getElementById('bulk-reschedule-overlay').classList.add('open');
+}
 // ── INIT ──
 document.getElementById('date-display').textContent=TODAY.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
 document.getElementById('streak-display').textContent='🔥 Day '+state.streak;
@@ -2800,6 +2987,7 @@ if(!state.visionSectionOrder) state.visionSectionOrder=['h48','vision','quote','
 processRepeatingMissions();
 applySettings();
 applyTheme();
+restoreNavOrder();
 renderDaily();
 renderWarzones();
 renderCalendar();
@@ -2910,6 +3098,39 @@ setInterval(()=>{
       <button class="reschedule-btn" onclick="toggleDetailRescheduleCard()" id="detail-reschedule-toggle-btn">↷ Reschedule</button>
       <button class="btn" onclick="closeDetailModal()">Cancel</button>
       <button class="btn btn-primary" onclick="saveDetailModal()">Save</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- BULK RESCHEDULE MODAL -->
+<div class="detail-overlay" id="bulk-reschedule-overlay" onclick="if(event.target===this)closeBulkReschedule()">
+  <div class="detail-modal" style="max-width:420px;">
+    <div class="detail-header">
+      <span class="detail-title-input" style="cursor:default;">↷ Bulk Reschedule</span>
+      <button class="panel-close" onclick="closeBulkReschedule()">✕</button>
+    </div>
+    <div class="detail-body">
+      <p style="font-size:12.5px;color:var(--tx1);margin-bottom:1rem;">Move all selected missions to a specific date and GWS slot.</p>
+      <div class="detail-field">
+        <span class="detail-field-label">New Date</span>
+        <input type="date" id="bulk-r-date" class="detail-field-value"/>
+      </div>
+      <div class="detail-field">
+        <span class="detail-field-label">GWS Slot</span>
+        <select id="bulk-r-gws" class="detail-field-value">
+          <option value="1">GWS #1 — 08:00</option>
+          <option value="2">GWS #2 — 10:00</option>
+          <option value="3">GWS #3 — 13:00</option>
+          <option value="4">GWS #4 — 15:00</option>
+        </select>
+      </div>
+      <div id="bulk-r-gws4-warn" style="display:none;font-size:11px;color:#92400E;background:#FEF3C7;border:1px solid #FCD34D;border-radius:4px;padding:6px 8px;margin-top:0.5rem;">⚠ GWS #4 is your reserved 9-5 slot. All selected tasks will land there.</div>
+      <p id="bulk-r-count" style="font-size:11px;color:var(--tx2);margin-top:0.75rem;"></p>
+    </div>
+    <div class="detail-footer">
+      <button class="btn" onclick="closeBulkReschedule()">Cancel</button>
+      <button class="btn btn-primary" onclick="applyBulkReschedule()">Apply to All</button>
     </div>
   </div>
 </div>
