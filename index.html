@@ -284,7 +284,7 @@ body{font-family:var(--font-body);background:var(--bg1);color:var(--tx0);min-hei
 .master-section-header{padding:0.6rem 0.875rem;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius) var(--radius) 0 0;display:flex;align-items:center;justify-content:space-between;cursor:pointer;margin-top:0.75rem;}
 .master-section-header:first-child{margin-top:0;}
 .master-section-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;font-family:var(--font-mono);}
-.master-section-body{border:1px solid var(--border);border-top:none;border-radius:0 0 var(--radius) var(--radius);overflow:hidden;}
+.master-section-body{border:1px solid var(--border);border-top:none;border-radius:0 0 var(--radius) var(--radius);}
 .master-row{display:grid;grid-template-columns:2fr 1fr 1fr 70px 60px auto;align-items:center;padding:0.6rem 0.875rem;border-bottom:1px solid var(--border);gap:0.75rem;transition:background 0.12s;}
 .master-row:last-child{border-bottom:none;}
 .master-row:hover{background:var(--bg1);}
@@ -624,7 +624,7 @@ body.light-forced .theme-toggle-knob{left:16px;background:var(--amber);}
 .ctx-icon{font-size:13px;width:16px;text-align:center;flex-shrink:0;}
 
 /* STICKY HEADER */
-.master-sticky-header{position:sticky;top:0;z-index:10;background:var(--bg1);border-bottom:2px solid var(--border2);}
+.master-sticky-header{position:sticky;top:0;z-index:10;background:var(--bg1);border-bottom:2px solid var(--border2);border-radius:var(--radius) var(--radius) 0 0;}
 .master-sticky-header .col-header-row{background:var(--bg1);border-bottom:none;}
 
 /* COLUMN CUSTOMISER */
@@ -1879,10 +1879,18 @@ function applyBulkReschedule(){
 
 
 function buildColGrid(cols){
-  // Build grid-template-columns from active cols
+  // Widths tuned to actual content sizes
   const widths = {
-    name:'2fr', type:'90px', priority:'90px', date:'90px', gws:'70px',
-    battlefront:'1fr', warzone:'1fr', checkpoint:'1fr', status:'80px', actions:'auto'
+    name:'minmax(200px,2fr)',
+    type:'100px',
+    priority:'100px',
+    date:'100px',
+    gws:'55px',
+    battlefront:'minmax(120px,1fr)',
+    warzone:'minmax(100px,1fr)',
+    checkpoint:'minmax(100px,1fr)',
+    status:'75px',
+    actions:'minmax(160px,auto)'
   };
   return cols.map(col=>widths[col.key]||'1fr').join(' ');
 }
@@ -1920,7 +1928,7 @@ function buildMasterRow(m, cols, rowClass, isSel){
   }).join('');
 
   return `<div class="${rowClass} ${isSel?'selected':''}" id="mrow-${m.id}"
-    style="display:grid;grid-template-columns:${grid};align-items:center;padding:0.55rem 0.875rem;border-bottom:1px solid var(--border);gap:0.75rem;transition:background 0.12s;cursor:pointer;"
+    style="display:grid;grid-template-columns:${grid};align-items:center;padding:0.55rem 0.875rem;border-bottom:1px solid var(--border);gap:0.75rem;transition:background 0.12s;cursor:pointer;min-width:0;"
     onclick="masterRowClick(${m.id},event)"
     oncontextmenu="openCtxMenu(event,${m.id},'master')"
     ontouchstart="startLongPress(event,${m.id},'master')"
@@ -1931,8 +1939,8 @@ function buildMasterRow(m, cols, rowClass, isSel){
 
 function buildColHeaderRow(cols){
   const grid = buildColGrid(cols);
-  const labels = cols.map(col=>`<span style="font-size:9px;text-transform:uppercase;letter-spacing:0.08em;color:var(--tx3);font-family:var(--font-mono);">${col.label}</span>`).join('');
-  return `<div style="display:grid;grid-template-columns:${grid};padding:0.4rem 0.875rem;gap:0.75rem;border-bottom:1px solid var(--border2);background:var(--bg1);">${labels}</div>`;
+  const labels = cols.map(col=>`<span style="font-size:9px;text-transform:uppercase;letter-spacing:0.08em;color:var(--tx3);font-family:var(--font-mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${col.label}</span>`).join('');
+  return `<div style="display:grid;grid-template-columns:${grid};padding:0.4rem 0.875rem;gap:0.75rem;background:var(--bg1);">${labels}</div>`;
 }
 
 function renderMaster(){
@@ -1950,10 +1958,11 @@ function renderMaster(){
   if(masterViewMode==='flat'){
     if(!missions.length){container.innerHTML='<div class="empty-state">No missions found.</div>';return;}
     const sorted=[...missions].sort((a,b)=>a.date.localeCompare(b.date));
-    container.innerHTML=`<div style="background:var(--bg0);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;">
-      <div class="master-sticky-header">${buildColHeaderRow(cols)}</div>
-      ${sorted.map(m=>buildMasterRow(m,cols,'master-flat-row',selectedMissions.has(m.id))).join('')}
-    </div>`;
+    container.innerHTML=
+      `<div class="master-sticky-header" style="border:1px solid var(--border);border-bottom:2px solid var(--border2);">${buildColHeaderRow(cols)}</div>` +
+      `<div style="background:var(--bg0);border:1px solid var(--border);border-top:none;border-radius:0 0 var(--radius-lg) var(--radius-lg);">
+        ${sorted.map(m=>buildMasterRow(m,cols,'master-flat-row',selectedMissions.has(m.id))).join('')}
+      </div>`;
     return;
   }
 
@@ -1973,8 +1982,8 @@ function renderMaster(){
         <span class="master-section-title"><span class="tag ${col.wtag}">${g.warzone}</span> &nbsp;${g.battlefront}</span>
         <span style="font-size:10px;font-family:var(--font-mono);color:var(--tx2);">${g.missions.length} missions</span>
       </div>
-      <div class="master-section-body" style="overflow:visible;">
-        <div class="master-sticky-header">${buildColHeaderRow(cols)}</div>
+      <div class="master-sticky-header" style="border:1px solid var(--border);border-top:none;border-bottom:2px solid var(--border2);">${buildColHeaderRow(cols)}</div>
+      <div class="master-section-body">
         ${sorted.map(m=>buildMasterRow(m,cols,'master-row',selectedMissions.has(m.id))).join('')}
       </div>
     </div>`;
