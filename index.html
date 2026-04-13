@@ -85,6 +85,7 @@ body{font-family:var(--font-body);background:var(--bg1);color:var(--tx0);min-hei
 
 /* MAIN */
 .main{flex:1;overflow-y:auto;display:flex;flex-direction:column;min-width:0;}
+.view-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
 .topbar{background:var(--bg0);border-bottom:1px solid var(--border);padding:0.875rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:15;}
 .topbar-left h2{font-family:var(--font-head);font-size:15px;font-weight:600;}
 .topbar-left p{font-size:11px;color:var(--tx2);margin-top:1px;}
@@ -624,7 +625,7 @@ body.light-forced .theme-toggle-knob{left:16px;background:var(--amber);}
 .ctx-icon{font-size:13px;width:16px;text-align:center;flex-shrink:0;}
 
 /* STICKY HEADER */
-.master-sticky-header{position:sticky;top:0;z-index:10;background:var(--bg1);border-bottom:2px solid var(--border2);border-radius:var(--radius) var(--radius) 0 0;}
+.master-sticky-header{position:sticky;top:-1.25rem;z-index:10;background:var(--bg1);border-bottom:2px solid var(--border2);border-radius:var(--radius) var(--radius) 0 0;margin:0 -1.5rem;padding:0.4rem 1.5rem 0.4rem 1.5rem;box-sizing:border-box;}
 .master-sticky-header .col-header-row{background:var(--bg1);border-bottom:none;}
 
 /* COLUMN CUSTOMISER */
@@ -639,6 +640,12 @@ body.light-forced .theme-toggle-knob{left:16px;background:var(--amber);}
 .col-custom-item input[type=checkbox]{width:13px;height:13px;accent-color:var(--blue);cursor:pointer;}
 .col-custom-item .drag-grip{font-size:13px;color:var(--tx3);cursor:grab;}
 .col-custom-item.col-drag-over{border-top:2px solid var(--blue);}
+
+/* GWS QUICK PICK in detail modal */
+.gws-quickpick{display:flex;gap:4px;flex-shrink:0;}
+.gws-qbtn{font-size:10px;padding:3px 7px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg1);color:var(--tx1);cursor:pointer;font-family:var(--font-mono);transition:all 0.12s;white-space:nowrap;}
+.gws-qbtn:hover{background:var(--amber-bg);border-color:var(--amber);color:var(--amber);}
+.gws-qbtn.active{background:var(--amber-bg);border-color:var(--amber);color:var(--amber);font-weight:600;}
 </style>
 </head>
 <body>
@@ -1302,7 +1309,7 @@ function buildMissionCard(m,isPushed){
   const typeColor=m.type==='One-Time'?'tag-red':m.type==='Daily'?'tag-blue':m.type==='Weekly'?'tag-amber':'tag-green';
   const cdText=getCountdownText(m);
   const nextOcc=getNextOccurrenceText(m);
-  const nextOccHtml=nextOcc?`<span class="next-occurrence ${nextOcc.soon?'soon':''}">↻ ${nextOcc.text}</span>`:'';
+  const nextOccHtml=nextOcc?`<span class="next-occurrence ${nextOcc.soon?'soon':''}" style="font-size:9px;padding:1px 5px;">↻ ${nextOcc.text}</span>`:'';
   const currentSlot=getGwsSlot(t)||1;
   const isDailySel = dailySelectedMissions.has(m.id);
   return `<div class="mission-card ${isDone?'done':''} ${isPushed?'pushed':''} ${isDailySel?'selected':''}" id="mc-${m.id}"
@@ -1314,6 +1321,7 @@ function buildMissionCard(m,isPushed){
       <div class="mission-top-row">
         <span class="mission-time-compact">${formatTime(t)}</span>
         <span class="mission-name ${isDone?'done':''}">${m.name}</span>
+        ${nextOccHtml}
         <div class="mission-tags">
           <span class="tag ${col.wtag}">${m.battlefront}</span>
           <span class="tag ${typeColor}">${m.type}</span>
@@ -1325,7 +1333,6 @@ function buildMissionCard(m,isPushed){
       ${m.notes?`<div class="mission-notes">${m.notes}</div>`:''}
     </div>
     <div class="mission-right">
-      ${nextOccHtml}
       <span class="gws-badge">⏱${m.gws}G</span>
       ${isPushed?`<button class="push-btn" onclick="moveToToday(${m.id})">→ Today</button>`:''}
       ${!isDone?`<button class="reschedule-btn" onclick="event.stopPropagation();askPush(${m.id})">↷ Reschedule</button>`:''}
@@ -1395,7 +1402,7 @@ function toggleMission(id){
   if(!m) return;
   saveUndo();
   m.status=m.status==='Done'?'To Do':'Done';
-  save(); renderDaily(); renderCalendar(); renderMaster();
+  save(); renderAll();
   // If calendar day modal is open, refresh it
   if(calDayModalDate && document.getElementById('cal-day-modal').classList.contains('open')){
     openCalDayModal(calDayModalDate);
@@ -1405,7 +1412,7 @@ function deleteMission(id){
   if(!confirm('Delete this mission?')) return;
   saveUndo();
   state.missions=state.missions.filter(x=>x.id!==id);
-  save(); renderDaily(); renderWarzones(); renderCalendar(); renderMaster();
+  save(); renderAll();
 }
 function moveToToday(id){
   const m=state.missions.find(x=>x.id===id);
@@ -1906,8 +1913,14 @@ function buildMasterRow(m, cols, rowClass, isSel){
   const cells = cols.map(c2=>{
     switch(c2.key){
       case 'name': return `<div style="display:flex;align-items:center;gap:8px;min-width:0;">
-        <div class="status-dot ${m.status==='Done'?'status-dot-done':'status-dot-todo'}"></div>
-        <div style="min-width:0;"><div class="master-row-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${m.name}</div>${m.checkpoint?`<div style="font-size:10px;color:var(--tx2);">📍 ${m.checkpoint}</div>`:''}</div>
+        <div class="status-dot ${m.status==='Done'?'status-dot-done':'status-dot-todo'}" style="flex-shrink:0;"></div>
+        <div style="min-width:0;">
+          <div style="display:flex;align-items:center;gap:5px;min-width:0;">
+            <div class="master-row-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${m.name}</div>
+            ${nextOcc?`<span class="next-occurrence ${nextOcc.soon?'soon':''}" style="font-size:9px;padding:1px 5px;flex-shrink:0;">↻ ${nextOcc.text}</span>`:''}
+          </div>
+          ${m.checkpoint?`<div style="font-size:10px;color:var(--tx2);">📍 ${m.checkpoint}</div>`:''}
+        </div>
       </div>`;
       case 'type': return `<div style="display:flex;flex-direction:column;gap:3px;"><span class="tag ${typeColor}" style="font-size:10px;">${m.type}</span>${cdText?`<span class="countdown-badge ${cdText==='Due today'?'due-soon':''}">${cdText}</span>`:''}</div>`;
       case 'priority': return `<span class="tag ${prioColor}" style="font-size:10px;">${m.priority}</span>`;
@@ -1918,7 +1931,6 @@ function buildMasterRow(m, cols, rowClass, isSel){
       case 'checkpoint': return `<span style="font-size:11px;color:var(--tx2);">${m.checkpoint||'—'}</span>`;
       case 'status': return `<span style="font-size:11px;color:${m.status==='Done'?'var(--green)':'var(--tx2)'};">${m.status}</span>`;
       case 'actions': return `<div style="display:flex;gap:4px;align-items:center;flex-wrap:nowrap;">
-        ${nextOcc?`<span class="next-occurrence ${nextOcc.soon?'soon':''}">↻ ${nextOcc.text}</span>`:''}
         <button class="reschedule-btn" onclick="event.stopPropagation();askPush(${m.id})">↷ Reschedule</button>
         <button class="icon-btn edit-btn" onclick="event.stopPropagation();openDetailModal(${m.id})">✎</button>
         <button class="icon-btn del-btn" onclick="event.stopPropagation();deleteMission(${m.id})">×</button>
@@ -2073,6 +2085,7 @@ function openDetailModal(id){
   document.getElementById('detail-priority').value = m.priority;
   document.getElementById('detail-date').value = m.date || '';
   document.getElementById('detail-time').value = m.time || '';
+  setTimeout(updateGwsQBtns, 0);
   document.getElementById('detail-gws-select').value = String(detailGws);
   document.getElementById('detail-checkpoint').value = m.checkpoint || '';
   document.getElementById('detail-notes').value = m.notes || '';
@@ -2640,6 +2653,8 @@ function switchView(v){
   const navItems=document.querySelectorAll('.nav-section:first-of-type .nav-item');
   const navMap={daily:0,warzones:1,master:2,calendar:3,vision:4,ooda:5};
   if(navMap[v]!==undefined && navItems[navMap[v]]) navItems[navMap[v]].classList.add('active');
+  // Persist current view across refresh
+  sessionStorage.setItem('gos_view', v);
 }
 
 // ── SETTINGS ──
@@ -3072,7 +3087,16 @@ function redo(){
 }
 
 function renderAll(){
-  renderDaily(); renderWarzones(); renderMaster(); renderCalendar();
+  renderDaily();
+  renderCalendar();
+  renderMaster();
+  renderWarzones();
+  // Only render vision/ooda if they are the active view
+  const active = document.querySelector('.view.active');
+  if(active){
+    if(active.id==='view-vision') renderVision();
+    if(active.id==='view-ooda') renderOoda();
+  }
 }
 
 document.addEventListener('keydown', function(e){
@@ -3290,6 +3314,21 @@ document.addEventListener('click', function(e){
   if(panel && panel.classList.contains('open') && !e.target.closest('.col-custom-wrapper')) panel.classList.remove('open');
 });
 
+
+function setDetailTimeFromGws(slot){
+  const times = {1:'08:00', 2:'10:00', 3:'13:00', 4:'15:00'};
+  document.getElementById('detail-time').value = times[slot] || '';
+  updateGwsQBtns();
+}
+
+function updateGwsQBtns(){
+  const t = document.getElementById('detail-time').value;
+  const times = {1:'08:00', 2:'10:00', 3:'13:00', 4:'15:00'};
+  [1,2,3,4].forEach(slot=>{
+    const btn = document.getElementById('gqs-'+slot);
+    if(btn) btn.classList.toggle('active', t === times[slot]);
+  });
+}
 // ── INIT ──
 document.getElementById('date-display').textContent=TODAY.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
 document.getElementById('streak-display').textContent='🔥 Day '+state.streak;
@@ -3300,7 +3339,13 @@ processRepeatingMissions();
 applySettings();
 applyTheme();
 restoreNavOrder();
-renderDaily();
+// Restore last active view across refresh
+const _savedView = sessionStorage.getItem('gos_view');
+if(_savedView && document.getElementById('view-'+_savedView)){
+  switchView(_savedView);
+} else {
+  renderDaily();
+}
 renderWarzones();
 renderCalendar();
 
@@ -3349,11 +3394,22 @@ setInterval(()=>{
           <option value="Medium">Medium</option>
         </select>
       </div>
-      <div class="detail-field">
-        <span class="detail-field-label">Date &amp; Time</span>
-        <div class="detail-datetime-row">
-          <input type="date" id="detail-date"/>
-          <input type="time" id="detail-time"/>
+      <div class="detail-field" style="flex-direction:column;align-items:stretch;gap:6px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="detail-field-label" style="flex-shrink:0;">Date &amp; Time</span>
+          <div class="detail-datetime-row" style="flex:1;min-width:0;">
+            <input type="date" id="detail-date"/>
+            <input type="time" id="detail-time" oninput="updateGwsQBtns()"/>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;padding-left:98px;">
+          <span style="font-size:10px;color:var(--tx3);font-family:var(--font-mono);white-space:nowrap;">Quick GWS:</span>
+          <div class="gws-quickpick">
+            <button class="gws-qbtn" id="gqs-1" onclick="setDetailTimeFromGws(1)" title="GWS #1 — 08:00">GWS#1</button>
+            <button class="gws-qbtn" id="gqs-2" onclick="setDetailTimeFromGws(2)" title="GWS #2 — 10:00">GWS#2</button>
+            <button class="gws-qbtn" id="gqs-3" onclick="setDetailTimeFromGws(3)" title="GWS #3 — 13:00">GWS#3</button>
+            <button class="gws-qbtn" id="gqs-4" onclick="setDetailTimeFromGws(4)" title="GWS #4 — 15:00">GWS#4</button>
+          </div>
         </div>
       </div>
       <div class="detail-field">
