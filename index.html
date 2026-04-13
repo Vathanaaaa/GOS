@@ -646,6 +646,34 @@ body.light-forced .theme-toggle-knob{left:16px;background:var(--amber);}
 .gws-qbtn{font-size:10px;padding:3px 7px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg1);color:var(--tx1);cursor:pointer;font-family:var(--font-mono);transition:all 0.12s;white-space:nowrap;}
 .gws-qbtn:hover{background:var(--amber-bg);border-color:var(--amber);color:var(--amber);}
 .gws-qbtn.active{background:var(--amber-bg);border-color:var(--amber);color:var(--amber);font-weight:600;}
+
+/* UNSCHEDULED SECTION */
+.unscheduled-section{background:var(--red-bg);border:2px solid var(--red);border-radius:var(--radius-lg);margin-bottom:1rem;overflow:hidden;}
+.unscheduled-header{padding:0.75rem 1.125rem;display:flex;align-items:center;justify-content:space-between;background:var(--red-bg);}
+.unscheduled-title{font-family:var(--font-head);font-size:13px;font-weight:700;color:var(--red);display:flex;align-items:center;gap:8px;}
+.unscheduled-count{font-size:10px;font-family:var(--font-mono);color:var(--red);opacity:0.8;}
+.unscheduled-body{background:var(--bg0);}
+/* Unscheduled calendar panel */
+.cal-unscheduled{margin-top:1rem;background:var(--red-bg);border:2px solid var(--red);border-radius:var(--radius-lg);overflow:hidden;}
+.cal-unscheduled-header{padding:0.6rem 1rem;display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
+.cal-unscheduled-title{font-size:12px;font-weight:700;color:var(--red);font-family:var(--font-head);display:flex;align-items:center;gap:6px;}
+.cal-unscheduled-body{background:var(--bg0);padding:0.75rem;display:flex;flex-wrap:wrap;gap:6px;}
+.cal-unsched-pill{background:var(--bg1);border:1px solid var(--red-mid);border-radius:var(--radius);padding:5px 10px;font-size:11px;cursor:pointer;transition:all 0.12s;display:flex;align-items:center;gap:6px;}
+.cal-unsched-pill:hover{background:var(--red-bg);border-color:var(--red);}
+.cal-unsched-pill-name{font-weight:500;color:var(--tx0);}
+.cal-unsched-pill-bf{font-size:10px;color:var(--tx2);}
+
+/* SORT PANEL */
+.sort-wrapper{position:relative;}
+.sort-panel{display:none;position:absolute;top:calc(100% + 6px);right:0;background:var(--bg0);border:1px solid var(--border2);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);z-index:50;width:240px;padding:0.625rem;}
+.sort-panel.open{display:block;}
+.sort-panel-title{font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:0.06em;font-family:var(--font-mono);margin-bottom:0.5rem;}
+.sort-row{display:flex;align-items:center;gap:6px;margin-bottom:0.375rem;}
+.sort-row label{font-size:11px;color:var(--tx2);min-width:50px;flex-shrink:0;}
+.sort-row select{flex:1;font-size:12px;padding:4px 7px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg0);color:var(--tx0);font-family:var(--font-body);}
+.sort-apply-btn{width:100%;margin-top:0.5rem;padding:5px;border-radius:var(--radius);border:none;background:var(--blue);color:white;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font-body);}
+.sort-apply-btn:hover{opacity:0.85;}
+.sort-btn-active{background:var(--blue-bg)!important;color:var(--blue)!important;border-color:var(--blue)!important;}
 </style>
 </head>
 <body>
@@ -818,6 +846,32 @@ body.light-forced .theme-toggle-knob{left:16px;background:var(--amber);}
           <button class="filter-btn active" id="master-view-grouped" onclick="setMasterView('grouped')">Grouped</button>
           <button class="filter-btn" id="master-view-flat" onclick="setMasterView('flat')">Flat</button>
         </div>
+        <div class="sort-wrapper">
+          <button class="filter-btn" id="sort-btn" onclick="toggleSortPanel()">⇅ Sort</button>
+          <div class="sort-panel" id="sort-panel">
+            <div class="sort-panel-title">Sort by</div>
+            <div class="sort-row">
+              <label>Field</label>
+              <select id="sort-field">
+                <option value="date">Date</option>
+                <option value="name">Mission name</option>
+                <option value="priority">Priority</option>
+                <option value="type">Type</option>
+                <option value="gws">GWS</option>
+                <option value="status">Status</option>
+                <option value="battlefront">Battlefront</option>
+              </select>
+            </div>
+            <div class="sort-row">
+              <label>Order</label>
+              <select id="sort-dir">
+                <option value="asc">A → Z / Earliest first</option>
+                <option value="desc">Z → A / Latest first</option>
+              </select>
+            </div>
+            <button class="sort-apply-btn" onclick="applySort()">Apply Sort</button>
+          </div>
+        </div>
         <div class="col-custom-wrapper">
           <button class="btn col-custom-btn" onclick="toggleColPanel()" id="col-custom-btn">⊞ Columns</button>
           <div class="col-custom-panel" id="col-custom-panel">
@@ -839,6 +893,7 @@ body.light-forced .theme-toggle-knob{left:16px;background:var(--amber);}
       </div>
       <div class="cal-grid" id="cal-headers"></div>
       <div class="cal-grid" style="margin-top:4px;" id="cal-grid"></div>
+      <div id="cal-unscheduled-panel"></div>
     </div>
 
     <!-- VISION VIEW -->
@@ -1131,7 +1186,7 @@ function processRepeatingMissions(){
   });
 
   // One-Time: roll any incomplete past-dated One-Time missions forward to today
-  state.missions.filter(m => m.type === 'One-Time' && m.status !== 'Done' && m.date < TODAYSTR).forEach(m => {
+  state.missions.filter(m => m.type === 'One-Time' && m.status !== 'Done' && m.date && m.date < TODAYSTR).forEach(m => {
     m.date = TODAYSTR;
   });
 
@@ -1246,7 +1301,7 @@ function renderDaily(){
   const allToday = [...todayMs,...doneTodayMs];
   // Pushed: only One-Time and Weekly/Monthly that are overdue and not done
   const pushed = state.missions.filter(m =>
-    m.date < TODAYSTR && m.status !== 'Done' && m.type !== 'Daily'
+    m.date && m.date < TODAYSTR && m.status !== 'Done' && m.type !== 'Daily'
   );
 
   const done=doneTodayMs.length, total=allToday.length;
@@ -1955,6 +2010,57 @@ function buildColHeaderRow(cols){
   return `<div style="display:grid;grid-template-columns:${grid};padding:0.4rem 0.875rem;gap:0.75rem;background:var(--bg1);">${labels}</div>`;
 }
 
+// Sort state — architecture ready for multi-level later
+let masterSort = JSON.parse(sessionStorage.getItem('gos_sort')||'{"field":"date","dir":"asc"}');
+
+function applyMasterSort(missions){
+  const {field, dir} = masterSort;
+  const PRIO_ORDER = {Critical:0, High:1, Normal:2, Medium:3, Low:4};
+  return [...missions].sort((a,b)=>{
+    let av = a[field]||'', bv = b[field]||'';
+    if(field==='priority'){ av=PRIO_ORDER[a.priority]??9; bv=PRIO_ORDER[b.priority]??9; }
+    if(field==='gws'){ av=parseInt(a.gws)||0; bv=parseInt(b.gws)||0; }
+    // Blank dates always sort to end regardless of direction
+    if(field==='date'){
+      if(!a.date && !b.date) return 0;
+      if(!a.date) return 1;
+      if(!b.date) return -1;
+    }
+    let cmp = typeof av==='number' ? av-bv : String(av).localeCompare(String(bv));
+    return dir==='desc' ? -cmp : cmp;
+  });
+}
+
+function toggleSortPanel(){
+  const panel = document.getElementById('sort-panel');
+  if(panel.classList.contains('open')){ panel.classList.remove('open'); return; }
+  // Restore current sort state into UI
+  document.getElementById('sort-field').value = masterSort.field;
+  document.getElementById('sort-dir').value = masterSort.dir;
+  panel.classList.add('open');
+}
+
+function applySort(){
+  masterSort = {
+    field: document.getElementById('sort-field').value,
+    dir: document.getElementById('sort-dir').value
+  };
+  sessionStorage.setItem('gos_sort', JSON.stringify(masterSort));
+  // Update button style
+  const btn = document.getElementById('sort-btn');
+  const isDefault = masterSort.field==='date' && masterSort.dir==='asc';
+  btn.classList.toggle('sort-btn-active', !isDefault);
+  btn.textContent = isDefault ? '⇅ Sort' : '⇅ Sort ('+masterSort.field+')';
+  document.getElementById('sort-panel').classList.remove('open');
+  renderMaster();
+}
+
+// Close sort panel on outside click
+document.addEventListener('click', function(e){
+  const panel = document.getElementById('sort-panel');
+  if(panel && panel.classList.contains('open') && !e.target.closest('.sort-wrapper')) panel.classList.remove('open');
+});
+
 function renderMaster(){
   const q=(document.getElementById('master-search').value||'').toLowerCase();
   let missions=state.missions.filter(m=>{
@@ -1967,28 +2073,53 @@ function renderMaster(){
   const container=document.getElementById('master-content');
   const cols = getActiveCols();
 
+  // Separate unscheduled (blank date) from scheduled
+  const unscheduled = missions.filter(m => !m.date);
+  const scheduled = missions.filter(m => m.date);
+
+  // Build unscheduled section HTML (shared by both views)
+  function buildUnscheduledSection(items){
+    if(!items.length) return '';
+    const sorted = applyMasterSort(items);
+    return `<div class="unscheduled-section">
+      <div class="unscheduled-header">
+        <span class="unscheduled-title">⚠ Unscheduled Missions</span>
+        <span class="unscheduled-count">${items.length} mission${items.length>1?'s':''} need a date</span>
+      </div>
+      <div class="master-sticky-header" style="border-top:1px solid var(--red-mid);border-bottom:2px solid var(--red-mid);">${buildColHeaderRow(cols)}</div>
+      <div class="unscheduled-body">
+        ${sorted.map(m=>buildMasterRow(m,cols,'master-flat-row',selectedMissions.has(m.id))).join('')}
+      </div>
+    </div>`;
+  }
+
   if(masterViewMode==='flat'){
     if(!missions.length){container.innerHTML='<div class="empty-state">No missions found.</div>';return;}
-    const sorted=[...missions].sort((a,b)=>a.date.localeCompare(b.date));
+    const sorted = applyMasterSort(scheduled);
     container.innerHTML=
-      `<div class="master-sticky-header" style="border:1px solid var(--border);border-bottom:2px solid var(--border2);">${buildColHeaderRow(cols)}</div>` +
-      `<div style="background:var(--bg0);border:1px solid var(--border);border-top:none;border-radius:0 0 var(--radius-lg) var(--radius-lg);">
-        ${sorted.map(m=>buildMasterRow(m,cols,'master-flat-row',selectedMissions.has(m.id))).join('')}
-      </div>`;
+      buildUnscheduledSection(unscheduled)+
+      (sorted.length ? (
+        `<div class="master-sticky-header" style="border:1px solid var(--border);border-bottom:2px solid var(--border2);">${buildColHeaderRow(cols)}</div>` +
+        `<div style="background:var(--bg0);border:1px solid var(--border);border-top:none;border-radius:0 0 var(--radius-lg) var(--radius-lg);">
+          ${sorted.map(m=>buildMasterRow(m,cols,'master-flat-row',selectedMissions.has(m.id))).join('')}
+        </div>`) : '');
     return;
   }
 
   // Grouped
   const grouped={};
-  missions.forEach(m=>{
+  scheduled.forEach(m=>{
     const key=m.warzone+'||'+m.battlefront;
     if(!grouped[key]) grouped[key]={warzone:m.warzone,battlefront:m.battlefront,missions:[]};
     grouped[key].missions.push(m);
   });
-  if(!Object.keys(grouped).length){container.innerHTML='<div class="empty-state">No missions found.</div>';return;}
-  container.innerHTML=Object.values(grouped).map(g=>{
+
+  const groupedHtml = Object.values(grouped).map(g=>{
     const col=getColors(g.warzone);
-    const sorted=[...g.missions].sort((a,b)=>a.date.localeCompare(b.date));
+    // Done missions go to bottom, rest sorted by masterSort
+    const active = applyMasterSort(g.missions.filter(m=>m.status!=='Done'));
+    const done = applyMasterSort(g.missions.filter(m=>m.status==='Done'));
+    const sorted = [...active, ...done];
     return `<div style="margin-bottom:0.625rem;">
       <div class="master-section-header">
         <span class="master-section-title"><span class="tag ${col.wtag}">${g.warzone}</span> &nbsp;${g.battlefront}</span>
@@ -2000,6 +2131,11 @@ function renderMaster(){
       </div>
     </div>`;
   }).join('');
+
+  if(!groupedHtml && !unscheduled.length){
+    container.innerHTML='<div class="empty-state">No missions found.</div>';return;
+  }
+  container.innerHTML = buildUnscheduledSection(unscheduled) + groupedHtml;
 }
 
 // ── MISSION MODAL ──
@@ -2253,6 +2389,7 @@ function renderCalendar(){
       ${pills}${more}
     </div>`;
   }).join('');
+  renderCalUnscheduled();
 }
 function changeMonth(dir){
   calMonth+=dir;
@@ -2291,6 +2428,32 @@ function openCalDayModal(dateStr){
   document.getElementById('cal-day-modal').classList.add('open');
 }
 function closeCalDayModal(){document.getElementById('cal-day-modal').classList.remove('open');}
+
+function renderCalUnscheduled(){
+  const panel = document.getElementById('cal-unscheduled-panel');
+  if(!panel) return;
+  const unscheduled = state.missions.filter(m => !m.date && m.status !== 'Done');
+  if(!unscheduled.length){ panel.innerHTML=''; return; }
+  // Sort by battlefront then name
+  const sorted = [...unscheduled].sort((a,b)=>{
+    const bf = a.battlefront.localeCompare(b.battlefront);
+    return bf !== 0 ? bf : a.name.localeCompare(b.name);
+  });
+  panel.innerHTML = `<div class="cal-unscheduled">
+    <div class="cal-unscheduled-header" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'flex':'none'">
+      <span class="cal-unscheduled-title">⚠ Unscheduled — ${unscheduled.length} mission${unscheduled.length>1?'s':''} need a date</span>
+      <span style="font-size:11px;color:var(--red);font-family:var(--font-mono);">click to toggle ↕</span>
+    </div>
+    <div class="cal-unscheduled-body">
+      ${sorted.map(m=>`<div class="cal-unsched-pill" onclick="openDetailModal(${m.id})" title="Click to assign a date">
+        <div>
+          <div class="cal-unsched-pill-name">${m.name}</div>
+          <div class="cal-unsched-pill-bf">${m.battlefront}</div>
+        </div>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
 function addMissionFromCalDay(){
   closeCalDayModal();
   openNewMissionModal();
@@ -2792,7 +2955,7 @@ function handleCsvUpload(e){
         const name=get('name'); if(!name){skipped++;continue;}
         const mtype=get('type')||'One-Time';
         const m={id:nextId++,name,warzone:get('warzone')||'Money Making',battlefront:get('battlefront')||'General',
-          type:mtype,priority:get('priority')||'Normal',date:get('date')||TODAYSTR,
+          type:mtype,priority:get('priority')||'Normal',date:(get('date')||(mtype==='Daily'||mtype==='Weekly'||mtype==='Monthly'?TODAYSTR:'')),
           time:get('time')||'',gws:parseInt(get('gws'))||1,checkpoint:get('checkpoint')||'',
           notes:get('notes')||'',status:'To Do'};
         if(mtype==='Daily') m.templateId='csv-daily-'+m.id;
@@ -3088,7 +3251,7 @@ function redo(){
 
 function renderAll(){
   renderDaily();
-  renderCalendar();
+  renderCalendar(); // includes renderCalUnscheduled
   renderMaster();
   renderWarzones();
   // Only render vision/ooda if they are the active view
@@ -3329,6 +3492,21 @@ function updateGwsQBtns(){
     if(btn) btn.classList.toggle('active', t === times[slot]);
   });
 }
+// Restore sort button state on load
+(function(){
+  const saved = sessionStorage.getItem('gos_sort');
+  if(saved){
+    try{
+      masterSort = JSON.parse(saved);
+      const btn = document.getElementById('sort-btn');
+      const isDefault = masterSort.field==='date' && masterSort.dir==='asc';
+      if(btn && !isDefault){
+        btn.classList.add('sort-btn-active');
+        btn.textContent = '⇅ Sort ('+masterSort.field+')';
+      }
+    }catch(e){}
+  }
+})();
 // ── INIT ──
 document.getElementById('date-display').textContent=TODAY.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
 document.getElementById('streak-display').textContent='🔥 Day '+state.streak;
