@@ -1163,6 +1163,7 @@ function getColors(wz){
 // ── REPEATING TASK ENGINE ──
 // Called once on load: ensures Daily/Weekly/Monthly missions have a fresh "To Do" copy for today
 function processRepeatingMissions(){
+  try {
   const lastRun = state.lastProcessedDate || '';
   // Always run — but skip duplicate creation if already ran today
   // This ensures imports with old lastProcessedDate still show today's tasks
@@ -1190,27 +1191,28 @@ function processRepeatingMissions(){
     m.date = TODAYSTR;
   });
 
-  // Weekly: find weekly missions due today (same weekday as their start date, or already past due without done version today)
-  state.missions.filter(m => m.type==='Weekly' && !m.templateId).forEach(m => {
-    const mDate = new Date(m.date);
+  // Weekly: find weekly missions due today (blank-date missions skipped)
+  state.missions.filter(m => m.type==='Weekly' && !m.templateId && m.date).forEach(m => {
+    const mDate = new Date(m.date+'T00:00:00');
+    if(isNaN(mDate.getTime())) return;
     const diffDays = Math.floor((TODAY - mDate) / 86400000);
     if(diffDays > 0 && m.status === 'Done'){
-      // It was done — schedule next occurrence 7 days from its date
-      const next = new Date(m.date); next.setDate(next.getDate() + 7);
-      const nextStr = next.toISOString().split('T')[0];
+      const next = new Date(m.date+'T00:00:00'); next.setDate(next.getDate() + 7);
+      const nextStr = localDateStr(next);
       if(nextStr <= TODAYSTR){
         m.date = nextStr; m.status = 'To Do';
       }
     }
   });
 
-  // Monthly: same pattern, 1 month forward
-  state.missions.filter(m => m.type==='Monthly' && !m.templateId).forEach(m => {
-    const mDate = new Date(m.date);
+  // Monthly: same pattern, 1 month forward (blank-date missions skipped)
+  state.missions.filter(m => m.type==='Monthly' && !m.templateId && m.date).forEach(m => {
+    const mDate = new Date(m.date+'T00:00:00');
+    if(isNaN(mDate.getTime())) return;
     if(m.status === 'Done' && mDate < TODAY){
-      const next = new Date(m.date);
+      const next = new Date(m.date+'T00:00:00');
       next.setMonth(next.getMonth() + 1);
-      const nextStr = next.toISOString().split('T')[0];
+      const nextStr = localDateStr(next);
       if(nextStr <= TODAYSTR){
         m.date = nextStr; m.status = 'To Do';
       }
@@ -1228,6 +1230,15 @@ function processRepeatingMissions(){
 
   state.lastProcessedDate = TODAYSTR;
   save();
+  } catch(err) {
+    console.error('processRepeatingMissions error:', err);
+    // Ensure Daily templates still get today's date even if something else failed
+    state.missions.filter(m => m.templateId && m.type === 'Daily').forEach(tmpl => {
+      if(tmpl.date !== TODAYSTR){ tmpl.date = TODAYSTR; tmpl.status = 'To Do'; }
+    });
+    state.lastProcessedDate = TODAYSTR;
+    save();
+  }
 }
 
 // ── COUNTDOWN HELPER ──
