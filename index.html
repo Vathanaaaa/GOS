@@ -1243,11 +1243,12 @@ function processRepeatingMissions(){
 
 // ── COUNTDOWN HELPER ──
 function getCountdownText(m){
-  // For incomplete tasks: show due-date proximity
   if(m.status!=='Done'){
     if(m.type==='Daily'||m.type==='One-Time') return null;
     if(m.type==='Weekly'||m.type==='Monthly'){
+      if(!m.date) return null;
       const d=new Date(m.date+'T00:00:00');
+      if(isNaN(d.getTime())) return null;
       const diff=Math.floor((d-TODAY)/86400000);
       if(diff<0) return null;
       if(diff===0) return 'Due today';
@@ -1257,7 +1258,7 @@ function getCountdownText(m){
     }
     return null;
   }
-  return null; // done tasks handled by getNextOccurrenceText
+  return null;
 }
 
 function getNextOccurrenceText(m){
@@ -1276,13 +1277,16 @@ function getNextOccurrenceText(m){
     nextOccurrence.setDate(nextOccurrence.getDate()+1);
     nextOccurrence.setHours(h,min,0,0);
   } else if(m.type==='Weekly'){
-    // Next occurrence = 7 days from mission date at its time
+    if(!m.date) return null;
     const base=new Date(m.date+'T00:00:00');
+    if(isNaN(base.getTime())) return null;
     nextOccurrence=new Date(base);
     nextOccurrence.setDate(nextOccurrence.getDate()+7);
     if(m.time){const[h,min]=m.time.split(':').map(Number);nextOccurrence.setHours(h,min,0,0);}
   } else if(m.type==='Monthly'){
+    if(!m.date) return null;
     const base=new Date(m.date+'T00:00:00');
+    if(isNaN(base.getTime())) return null;
     nextOccurrence=new Date(base);
     nextOccurrence.setMonth(nextOccurrence.getMonth()+1);
     if(m.time){const[h,min]=m.time.split(':').map(Number);nextOccurrence.setHours(h,min,0,0);}
@@ -3261,15 +3265,14 @@ function redo(){
 }
 
 function renderAll(){
-  renderDaily();
-  renderCalendar(); // includes renderCalUnscheduled
-  renderMaster();
-  renderWarzones();
-  // Only render vision/ooda if they are the active view
+  try{ renderDaily(); }catch(e){ console.error('renderDaily error:',e); }
+  try{ renderCalendar(); }catch(e){ console.error('renderCalendar error:',e); }
+  try{ renderMaster(); }catch(e){ console.error('renderMaster error:',e); }
+  try{ renderWarzones(); }catch(e){ console.error('renderWarzones error:',e); }
   const active = document.querySelector('.view.active');
   if(active){
-    if(active.id==='view-vision') renderVision();
-    if(active.id==='view-ooda') renderOoda();
+    try{ if(active.id==='view-vision') renderVision(); }catch(e){}
+    try{ if(active.id==='view-ooda') renderOoda(); }catch(e){}
   }
 }
 
