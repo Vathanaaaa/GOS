@@ -2823,6 +2823,7 @@ function switchView(v){
   const [title,sub]=VIEW_META[v]||['',''];
   document.getElementById('view-title').textContent=title;
   document.getElementById('view-sub').textContent=sub;
+  if(v==='daily') renderDaily();
   if(v==='calendar') renderCalendar();
   if(v==='warzones') renderWarzones();
   if(v==='master') renderMaster();
