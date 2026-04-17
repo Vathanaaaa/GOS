@@ -577,39 +577,18 @@ body.light-forced .theme-toggle-knob{left:16px;background:var(--amber);}
 /* RESCHEDULE MODAL */
 .reschedule-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center;}
 .reschedule-overlay.open{display:flex;}
-.reschedule-modal{background:var(--bg0);border-radius:var(--radius-xl);border:1px solid var(--border);width:780px;max-width:96vw;max-height:90vh;display:flex;flex-direction:column;box-shadow:var(--shadow-lg);overflow:hidden;}
-.reschedule-header{padding:1.125rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.reschedule-modal{background:var(--bg0);border-radius:var(--radius-xl);border:1px solid var(--border);width:420px;max-width:94vw;box-shadow:var(--shadow-lg);overflow:hidden;}
+.reschedule-header{padding:1.125rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
 .reschedule-title{font-family:var(--font-head);font-size:14px;font-weight:600;}
-.reschedule-body{padding:1.25rem;overflow-y:auto;flex:1;}
+.reschedule-body{padding:1.25rem;}
 .reschedule-mission-name{font-size:13px;font-weight:500;color:var(--tx0);margin-bottom:1rem;padding:0.75rem;background:var(--bg1);border-radius:var(--radius);border-left:3px solid var(--amber);}
 .reschedule-field{margin-bottom:0.875rem;}
 .reschedule-field label{font-size:11px;color:var(--tx2);display:block;margin-bottom:4px;font-family:var(--font-mono);}
 .reschedule-field input,.reschedule-field select{width:100%;padding:0.45rem 0.65rem;font-size:13px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg0);color:var(--tx0);font-family:var(--font-body);}
-.reschedule-fields-row{display:flex;gap:1rem;margin-bottom:0.875rem;}
-.reschedule-fields-row .reschedule-field{flex:1;margin-bottom:0;}
-.reschedule-cascade-section{margin-top:1rem;}
-.reschedule-cascade-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;}
-.reschedule-cascade-title{font-size:11px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:0.06em;font-family:var(--font-mono);}
-.reschedule-cascade-actions{display:flex;gap:8px;align-items:center;}
-.reschedule-select-all-btn{font-size:11px;padding:3px 8px;border-radius:4px;border:1px solid var(--border2);background:var(--bg1);color:var(--tx1);cursor:pointer;font-family:var(--font-body);}
-.reschedule-select-all-btn:hover{background:var(--bg2);}
-.reschedule-cascade-table{width:100%;border-collapse:collapse;font-size:12px;}
-.reschedule-cascade-table th{font-size:10px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:0.05em;font-family:var(--font-mono);padding:5px 8px;border-bottom:1px solid var(--border);text-align:left;background:var(--bg1);white-space:nowrap;}
-.reschedule-cascade-table th:first-child{border-radius:var(--radius) 0 0 0;padding-left:10px;}
-.reschedule-cascade-table th:last-child{border-radius:0 var(--radius) 0 0;}
-.reschedule-cascade-table td{padding:6px 8px;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--tx0);}
-.reschedule-cascade-table td:first-child{padding-left:10px;}
-.reschedule-cascade-table tr:last-child td{border-bottom:none;}
-.reschedule-cascade-table tr.cascade-row-checked{background:var(--blue-bg);}
-.cascade-mission-name{font-weight:500;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.cascade-bf-tag{font-size:10px;background:var(--bg2);color:var(--tx1);padding:2px 6px;border-radius:3px;white-space:nowrap;}
-.cascade-arrow{color:var(--amber);font-weight:700;margin:0 4px;}
-.cascade-new-slot{color:var(--blue);font-family:var(--font-mono);font-size:11px;font-weight:500;}
-.cascade-gws4-warn{color:var(--amber);font-size:10px;}
-.reschedule-cascade-empty{padding:0.75rem;text-align:center;color:var(--green);font-size:12px;background:var(--green-bg);border-radius:var(--radius);border:1px solid var(--green-mid);}
-.reschedule-footer{padding:1rem 1.25rem;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:space-between;align-items:center;flex-shrink:0;}
-.reschedule-footer-info{font-size:11px;color:var(--tx2);font-family:var(--font-mono);}
-.reschedule-footer-btns{display:flex;gap:8px;}
+.reschedule-cascade-preview{background:var(--bg1);border:1px solid var(--border);border-radius:var(--radius);padding:0.75rem;margin-top:0.75rem;font-size:11px;color:var(--tx2);font-family:var(--font-mono);max-height:140px;overflow-y:auto;}
+.reschedule-cascade-item{padding:2px 0;display:flex;gap:8px;align-items:center;}
+.reschedule-cascade-arrow{color:var(--amber);}
+.reschedule-footer{padding:1rem 1.25rem;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;}
 
 /* VISION DRAG-DROP */
 .vision-section[draggable]{cursor:grab;}
@@ -976,7 +955,7 @@ body.light-forced .theme-toggle-knob{left:16px;background:var(--amber);}
     </div>
     <div class="modal-field"><label>Start Date</label><input type="date" id="m-date"/></div>
     <div class="modal-field"><label>Scheduled Time (optional)</label><input type="time" id="m-time" placeholder="e.g. 08:00"/></div>
-    <div class="modal-field"><label>Duration</label>
+    <div class="modal-field"><label>GWS Required</label>
       <select id="m-gws">
         <option value="1">1 GWS (~1.5h)</option>
         <option value="2">2 GWS (~3h)</option>
@@ -992,7 +971,7 @@ body.light-forced .theme-toggle-knob{left:16px;background:var(--amber);}
   </div>
 </div>
 
-<!-- RESCHEDULE MODAL -->
+<!-- RESCHEDULE MODAL (replaces old push modal) -->
 <div class="reschedule-overlay" id="reschedule-overlay" onclick="if(event.target===this)closeReschedule()">
   <div class="reschedule-modal">
     <div class="reschedule-header">
@@ -1001,38 +980,25 @@ body.light-forced .theme-toggle-knob{left:16px;background:var(--amber);}
     </div>
     <div class="reschedule-body">
       <div class="reschedule-mission-name" id="reschedule-mission-name">Mission name</div>
-      <div class="reschedule-fields-row">
-        <div class="reschedule-field">
-          <label>NEW DATE</label>
-          <input type="date" id="reschedule-date" onchange="previewReschedule()">
-        </div>
-        <div class="reschedule-field">
-          <label>GWS SLOT</label>
-          <select id="reschedule-gws-slot" onchange="previewReschedule()">
-            <option value="1">GWS #1 — 08:00</option>
-            <option value="2">GWS #2 — 10:00</option>
-            <option value="3">GWS #3 — 13:00</option>
-            <option value="4">GWS #4 — 15:00</option>
-          </select>
-        </div>
+      <div class="reschedule-field">
+        <label>New Date</label>
+        <input type="date" id="reschedule-date">
       </div>
-      <div class="reschedule-cascade-section" id="reschedule-cascade-section" style="display:none;">
-        <div class="reschedule-cascade-header">
-          <span class="reschedule-cascade-title">Cascade Preview — select missions to shift</span>
-          <div class="reschedule-cascade-actions">
-            <button class="reschedule-select-all-btn" id="reschedule-select-all-btn" onclick="toggleSelectAllCascade()">Select All</button>
-          </div>
-        </div>
-        <div id="reschedule-cascade-table-wrap"></div>
-        <div id="reschedule-cascade-gws4-warn" style="display:none;margin-top:8px;font-size:11px;color:#92400E;background:#FEF3C7;border:1px solid #FCD34D;border-radius:4px;padding:6px 8px;">⚠ One or more missions will land on GWS #4 (your reserved weekday slot).</div>
+      <div class="reschedule-field">
+        <label>GWS Slot</label>
+        <select id="reschedule-gws-slot">
+          <option value="1">GWS #1 — 08:00 to 09:45</option>
+          <option value="2">GWS #2 — 10:00 to 11:45</option>
+          <option value="3">GWS #3 — 13:00 to 14:45</option>
+          <option value="4">GWS #4 — 15:00 to 16:45</option>
+        </select>
       </div>
+      <div id="reschedule-cascade-preview" class="reschedule-cascade-preview" style="display:none;"></div>
     </div>
     <div class="reschedule-footer">
-      <span class="reschedule-footer-info" id="reschedule-footer-info"></span>
-      <div class="reschedule-footer-btns">
-        <button class="btn" onclick="closeReschedule()">Cancel</button>
-        <button class="btn btn-primary" onclick="confirmReschedule()">Apply</button>
-      </div>
+      <button class="btn" onclick="closeReschedule()">Cancel</button>
+      <button class="btn btn-primary" onclick="previewReschedule()" id="reschedule-preview-btn">Preview Cascade</button>
+      <button class="btn btn-primary" onclick="confirmReschedule()" id="reschedule-confirm-btn" style="display:none;">Apply</button>
     </div>
   </div>
 </div>
@@ -1537,43 +1503,9 @@ function getGwsSlot(time){
 }
 function gwsStartTime(slot){ return GWS_SLOTS[slot]?GWS_SLOTS[slot].start:null; }
 
-// ── RESCHEDULE & CASCADE LOGIC ──
+// ── NEW RESCHEDULE LOGIC ──
 let rescheduleMissionId=null;
-let reschedulePreviewData=null; // {targetDate, targetSlot, mission, cascadeChanges:[{mission,newSlot,newDate,isGws4,id}]}
-
-function localDateStr(d){
-  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-}
-
-// Is a given date string a weekday (Mon-Fri)?
-function isWeekday(dateStr){
-  const d = new Date(dateStr+'T00:00:00');
-  const day = d.getDay(); // 0=Sun, 6=Sat
-  return day >= 1 && day <= 5;
-}
-
-// Max allowed slot for a given date (GWS#4 blocked on weekdays)
-function maxSlotForDate(dateStr){
-  return isWeekday(dateStr) ? 3 : 4;
-}
-
-// Given a date string, advance by N GWS-duration slots, respecting weekday GWS#4 rule.
-// duration = mission.gws (1 or 2 slots wide). Returns {date, slot}.
-function advanceByDuration(dateStr, slot, duration){
-  let d = dateStr;
-  let s = slot;
-  for(let i=0; i<duration; i++){
-    s++;
-    if(s > maxSlotForDate(d)){
-      // spill to next day slot 1
-      const next = new Date(d+'T00:00:00');
-      next.setDate(next.getDate()+1);
-      d = localDateStr(next);
-      s = 1;
-    }
-  }
-  return {date:d, slot:s};
-}
+let reschedulePreviewData=null;
 
 function askPush(id){
   rescheduleMissionId=id;
@@ -1581,18 +1513,39 @@ function askPush(id){
   const m=state.missions.find(x=>x.id===id);
   if(!m) return;
   document.getElementById('reschedule-mission-name').textContent=m.name;
+  // Default to tomorrow
   const tomorrow=new Date(TODAY); tomorrow.setDate(tomorrow.getDate()+1);
   document.getElementById('reschedule-date').value=localDateStr(tomorrow);
   document.getElementById('reschedule-gws-slot').value='1';
-  document.getElementById('reschedule-cascade-section').style.display='none';
-  document.getElementById('reschedule-footer-info').textContent='';
+  document.getElementById('reschedule-cascade-preview').style.display='none';
+  document.getElementById('reschedule-preview-btn').style.display='';
+  document.getElementById('reschedule-confirm-btn').style.display='none';
   document.getElementById('reschedule-overlay').classList.add('open');
-  previewReschedule();
 }
 
 function closeReschedule(){
   document.getElementById('reschedule-overlay').classList.remove('open');
   rescheduleMissionId=null; reschedulePreviewData=null;
+}
+
+// Reset preview when inputs change
+document.addEventListener('change', e=>{
+  if(e.target.id==='reschedule-date'||e.target.id==='reschedule-gws-slot'){
+    document.getElementById('reschedule-cascade-preview').style.display='none';
+    document.getElementById('reschedule-preview-btn').style.display='';
+    document.getElementById('reschedule-confirm-btn').style.display='none';
+    reschedulePreviewData=null;
+  }
+});
+
+function localDateStr(d){
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+function slotToMinutes(dateStr, slot){
+  // Convert a date+slot to a comparable number: days * 1000 + slot
+  const d = new Date(dateStr+'T00:00:00');
+  return d.getTime() / 86400000 * 10 + slot;
 }
 
 function previewReschedule(){
@@ -1601,168 +1554,90 @@ function previewReschedule(){
   if(!m) return;
   const targetDate=document.getElementById('reschedule-date').value;
   const targetSlot=parseInt(document.getElementById('reschedule-gws-slot').value);
-  if(!targetDate) return;
+  if(!targetDate){alert('Please select a date.');return;}
 
-  // ── NEW CASCADE ALGORITHM ──
-  // Rule: Today's missions are NEVER affected.
-  // For future days (starting from targetDate): missions on those days shift
-  // by exactly Mission A's duration (in GWS slots), chaining day by day.
-  // Only One-Time missions shift. Weekly/Monthly/Daily stay fixed.
+  const origDate = m.date;
+  const origSlot = getGwsSlot(m.time||autoAssignTime(m)) || 1;
+  const origScore = slotToMinutes(origDate, origSlot);
+  const targetScore = slotToMinutes(targetDate, targetSlot);
+  const slotDelta = targetScore - origScore; // positive = moving later, negative = earlier
 
-  const mDuration = parseInt(m.gws) || 1; // how many slots Mission A occupies
-
-  // Collect all incomplete One-Time missions on future days (> today),
-  // excluding Mission A itself, sorted by date then slot.
-  const futureMissions = state.missions
-    .filter(x => {
-      if(x.id === rescheduleMissionId || x.status === 'Done') return false;
-      if(x.type !== 'One-Time') return false;
-      if(!x.date || x.date <= TODAYSTR) return false; // today and past untouched
-      return true;
-    })
-    .map(x => ({
-      mission: x,
-      origDate: x.date,
-      origSlot: getGwsSlot(x.time || autoAssignTime(x)) || 1
-    }))
-    .sort((a,b) => {
-      if(a.origDate !== b.origDate) return a.origDate < b.origDate ? -1 : 1;
-      return a.origSlot - b.origSlot;
-    });
-
-  // For each future mission, shift forward by mDuration slots.
-  // advanceByDuration handles weekday GWS#4 blocking and day spillover.
-  const cascadeChanges = futureMissions.map((entry, idx) => {
-    const {date: newDate, slot: newSlot} = advanceByDuration(entry.origDate, entry.origSlot - 1, mDuration);
-    // We shift the slot position: origSlot + duration, spilling as needed
-    // Actually: we want to push each mission forward by mDuration slots from its current position
-    const {date: nd, slot: ns} = advanceByDuration(entry.origDate, entry.origSlot - 1 + (mDuration - 1), 1);
-    // Simpler: just add mDuration slots from (origDate, origSlot)
-    let tempDate = entry.origDate;
-    let tempSlot = entry.origSlot;
-    for(let i=0; i<mDuration; i++){
-      tempSlot++;
-      if(tempSlot > maxSlotForDate(tempDate)){
-        const next = new Date(tempDate+'T00:00:00');
-        next.setDate(next.getDate()+1);
-        tempDate = localDateStr(next);
-        tempSlot = 1;
-      }
-    }
-    const isGws4 = tempSlot === 4 && isWeekday(tempDate);
-    return {
-      id: 'cascade-'+idx,
-      mission: entry.mission,
-      origDate: entry.origDate,
-      origSlot: entry.origSlot,
-      newDate: tempDate,
-      newSlot: tempSlot,
-      isGws4
-    };
+  // Find all incomplete One-Time missions AFTER the original position
+  // "after" = same date + slot > origSlot, OR date > origDate
+  const toShift = state.missions.filter(x => {
+    if(x.id === rescheduleMissionId || x.status === 'Done') return false;
+    if(x.type === 'Weekly' || x.type === 'Monthly' || x.type === 'Daily') return false;
+    const xSlot = getGwsSlot(x.time||autoAssignTime(x)) || 1;
+    const xScore = slotToMinutes(x.date, xSlot);
+    return xScore > origScore;
   });
 
-  reschedulePreviewData = {targetDate, targetSlot, mission:m, cascadeChanges};
+  // Calculate new position for each: shift by slotDelta
+  // Each slot = 1 unit; days = 10 units per day (slots 1-4 per day, skip GWS#4 warning)
+  const cascadeChanges = [];
+  const gws4warnings = [];
 
-  // Render cascade table
-  const section = document.getElementById('reschedule-cascade-section');
-  const wrap = document.getElementById('reschedule-cascade-table-wrap');
-  const gws4warn = document.getElementById('reschedule-cascade-gws4-warn');
-  const footerInfo = document.getElementById('reschedule-footer-info');
+  toShift.forEach(x => {
+    const xSlot = getGwsSlot(x.time||autoAssignTime(x)) || 1;
+    const xScore = slotToMinutes(x.date, xSlot);
+    let newScore = xScore + slotDelta;
+
+    // Convert newScore back to date + slot
+    let newDay = Math.floor(newScore / 10);
+    let newSlot = Math.round(newScore % 10);
+    if(newSlot < 1) { newDay--; newSlot = 4; }
+    if(newSlot > 4) { newDay++; newSlot = 1; }
+    newSlot = Math.max(1, Math.min(4, newSlot));
+
+    const newDate = localDateStr(new Date(newDay * 86400000));
+    const isGws4 = newSlot === 4;
+    if(isGws4) gws4warnings.push(x.name);
+    cascadeChanges.push({mission:x, newSlot, newDate, isGws4});
+  });
+
+  reschedulePreviewData={targetDate, targetSlot, cascadeChanges, mission:m, slotDelta};
+
+  const preview=document.getElementById('reschedule-cascade-preview');
+  const gws4warn = gws4warnings.length ? `<div style="margin-top:6px;padding:6px 8px;background:#FEF3C7;border:1px solid #FCD34D;border-radius:4px;font-size:10px;color:#92400E;">⚠ ${gws4warnings.length} task(s) will land on GWS #4 (your reserved slot): ${gws4warnings.slice(0,3).join(', ')}${gws4warnings.length>3?'…':''}</div>` : '';
 
   if(!cascadeChanges.length){
-    wrap.innerHTML = '<div class="reschedule-cascade-empty">✓ No future missions to shift.</div>';
-    gws4warn.style.display='none';
+    preview.innerHTML=`<div style="color:var(--green);">✓ No other tasks to shift.</div>`;
   } else {
-    const hasGws4 = cascadeChanges.some(c=>c.isGws4);
-    gws4warn.style.display = hasGws4 ? 'block' : 'none';
-    wrap.innerHTML = `
-      <table class="reschedule-cascade-table">
-        <thead>
-          <tr>
-            <th style="width:32px;"></th>
-            <th>Mission</th>
-            <th>Battlefront</th>
-            <th>Duration</th>
-            <th>Current</th>
-            <th>→ New</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${cascadeChanges.map(ch => `
-            <tr id="crow-${ch.id}" class="">
-              <td><input type="checkbox" id="chk-${ch.id}" onchange="updateCascadeRow('${ch.id}')"></td>
-              <td><div class="cascade-mission-name" title="${ch.mission.name}">${ch.mission.name}</div></td>
-              <td><span class="cascade-bf-tag">${ch.mission.battlefront||'—'}</span></td>
-              <td style="font-family:var(--font-mono);font-size:11px;color:var(--tx2);">${ch.mission.gws||1}G</td>
-              <td style="font-family:var(--font-mono);font-size:11px;color:var(--tx2);">GWS#${ch.origSlot} · ${ch.origDate}</td>
-              <td>
-                <span class="cascade-new-slot">GWS#${ch.newSlot}${ch.isGws4?' <span class='cascade-gws4-warn'>⚠</span>':''}</span>
-                <span style="font-family:var(--font-mono);font-size:11px;color:var(--tx2);margin-left:4px;">${ch.newDate}</span>
-              </td>
-            </tr>`).join('')}
-        </tbody>
-      </table>`;
+    preview.innerHTML=
+      `<div style="color:var(--tx2);margin-bottom:8px;font-size:11px;">${cascadeChanges.length} task(s) will be affected. Move them too?</div>`+
+      `<div style="display:flex;gap:8px;margin-bottom:8px;">
+        <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;"><input type="radio" name="cascade-choice" value="yes"> Yes, shift all</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;"><input type="radio" name="cascade-choice" value="no" checked> No, keep fixed</label>
+      </div>`+
+      `<div style="max-height:140px;overflow-y:auto;">`+
+      cascadeChanges.map(ch=>`<div class="reschedule-cascade-item">
+        <span class="reschedule-cascade-arrow">→</span>
+        <span style="flex:1;font-size:11px;">${ch.mission.name}</span>
+        <span style="color:var(--amber);font-size:10px;">${ch.isGws4?'<span class="gws4-warn">GWS#4 ⚠</span> ':''} GWS#${ch.newSlot} · ${ch.newDate}</span>
+      </div>`).join('')+
+      `</div>${gws4warn}`;
   }
-  section.style.display='block';
-  updateCascadeSelectAllBtn();
-  updateFooterInfo();
-}
-
-function updateCascadeRow(id){
-  const chk = document.getElementById('chk-'+id);
-  const row = document.getElementById('crow-'+id);
-  if(chk && row) row.classList.toggle('cascade-row-checked', chk.checked);
-  updateCascadeSelectAllBtn();
-  updateFooterInfo();
-}
-
-function toggleSelectAllCascade(){
-  if(!reschedulePreviewData) return;
-  const allChks = reschedulePreviewData.cascadeChanges.map(ch=>document.getElementById('chk-'+ch.id)).filter(Boolean);
-  const allChecked = allChks.every(c=>c.checked);
-  allChks.forEach(c=>{
-    c.checked = !allChecked;
-    const row=document.getElementById('crow-'+c.id.replace('chk-',''));
-    if(row) row.classList.toggle('cascade-row-checked',!allChecked);
-  });
-  updateCascadeSelectAllBtn();
-  updateFooterInfo();
-}
-
-function updateCascadeSelectAllBtn(){
-  if(!reschedulePreviewData) return;
-  const allChks = reschedulePreviewData.cascadeChanges.map(ch=>document.getElementById('chk-'+ch.id)).filter(Boolean);
-  if(!allChks.length) return;
-  const allChecked = allChks.every(c=>c.checked);
-  const btn = document.getElementById('reschedule-select-all-btn');
-  if(btn) btn.textContent = allChecked ? 'Deselect All' : 'Select All';
-}
-
-function updateFooterInfo(){
-  if(!reschedulePreviewData) return;
-  const checked = reschedulePreviewData.cascadeChanges.filter(ch=>{
-    const c=document.getElementById('chk-'+ch.id); return c&&c.checked;
-  }).length;
-  const total = reschedulePreviewData.cascadeChanges.length;
-  const el=document.getElementById('reschedule-footer-info');
-  if(el) el.textContent = total ? `${checked} of ${total} missions selected to shift` : '';
+  preview.style.display='block';
+  document.getElementById('reschedule-preview-btn').style.display='none';
+  document.getElementById('reschedule-confirm-btn').style.display='';
 }
 
 function confirmReschedule(){
   if(!reschedulePreviewData) return;
   saveUndo();
-  const {targetDate, targetSlot, mission, cascadeChanges}=reschedulePreviewData;
+  const {targetDate, targetSlot, cascadeChanges, mission}=reschedulePreviewData;
+  const cascadeRadio = document.querySelector('input[name="cascade-choice"]:checked');
+  const doCascade = !cascadeRadio || cascadeRadio.value === 'yes';
   mission.date=targetDate;
   mission.time=gwsStartTime(targetSlot);
   mission.status='To Do';
-  cascadeChanges.forEach(ch=>{
-    const chk=document.getElementById('chk-'+ch.id);
-    if(chk && chk.checked){
+  if(doCascade){
+    cascadeChanges.forEach(ch=>{
       ch.mission.date=ch.newDate;
       ch.mission.time=gwsStartTime(ch.newSlot);
-    }
-  });
-  save(); closeReschedule(); renderAll();
+    });
+  }
+  save(); closeReschedule(); renderDaily(); renderCalendar(); renderMaster();
 }
 
 // Keep old names as aliases so nothing else breaks
@@ -2383,11 +2258,68 @@ function toggleDetailRescheduleCard(){
 }
 
 function applyDetailReschedule(){
-  // Delegate to main reschedule modal so cascade logic is unified
   if(detailMissionId === null) return;
-  const id = detailMissionId;
+  const m = state.missions.find(x => x.id === detailMissionId);
+  if(!m) return;
+  const targetDate = document.getElementById('dr-date').value;
+  const targetSlot = parseInt(document.getElementById('dr-gws').value);
+  if(!targetDate){ alert('Please select a date.'); return; }
+
+  const origDate = m.date;
+  const origSlot = getGwsSlot(m.time||autoAssignTime(m)) || 1;
+  const origScore = slotToMinutes(origDate, origSlot);
+  const targetScore = slotToMinutes(targetDate, targetSlot);
+  const slotDelta = targetScore - origScore;
+
+  const cascadeRadio = document.querySelector('input[name="dr-cascade"]:checked');
+  const doCascade = cascadeRadio && cascadeRadio.value === 'yes';
+
+  const toShift = doCascade ? state.missions.filter(x => {
+    if(x.id === detailMissionId || x.status === 'Done') return false;
+    if(x.type === 'Weekly' || x.type === 'Monthly' || x.type === 'Daily') return false;
+    const xSlot = getGwsSlot(x.time||autoAssignTime(x)) || 1;
+    return slotToMinutes(x.date, xSlot) > origScore;
+  }) : [];
+
+  // Check for GWS#4 hits
+  const gws4hits = [];
+  const changes = toShift.map(x => {
+    const xSlot = getGwsSlot(x.time||autoAssignTime(x)) || 1;
+    let newScore = slotToMinutes(x.date, xSlot) + slotDelta;
+    let newDay = Math.floor(newScore / 10);
+    let newSlot = Math.round(newScore % 10);
+    if(newSlot < 1){ newDay--; newSlot = 4; }
+    if(newSlot > 4){ newDay++; newSlot = 1; }
+    newSlot = Math.max(1, Math.min(4, newSlot));
+    const newDate = localDateStr(new Date(newDay * 86400000));
+    if(newSlot === 4) gws4hits.push(x.name);
+    return {mission:x, newSlot, newDate};
+  });
+
+  if(gws4hits.length){
+    document.getElementById('dr-gws4-warn').style.display = 'block';
+  }
+
+  const affected = changes.length;
+  const confirmMsg = affected > 0
+    ? `Move "${m.name}" to ${targetDate} GWS#${targetSlot}?
+
+${affected} task(s) will also shift.${gws4hits.length?' '+gws4hits.length+' will land on GWS#4 (reserved slot) — review after.':''}`
+    : `Move "${m.name}" to ${targetDate} GWS#${targetSlot}?`;
+
+  if(!confirm(confirmMsg)) return;
+  saveUndo();
+  m.date = targetDate;
+  m.time = gwsStartTime(targetSlot);
+  m.status = 'To Do';
+  changes.forEach(ch => {
+    ch.mission.date = ch.newDate;
+    ch.mission.time = gwsStartTime(ch.newSlot);
+  });
+
+  save();
   closeDetailModal();
-  askPush(id);
+  renderDaily(); renderCalendar(); renderMaster();
 }
 
 function closeDetailModal(){
@@ -3465,7 +3397,7 @@ const COL_DEFS = [
   {key:'type',     label:'Type',       locked:false, defaultOn:true},
   {key:'priority', label:'Priority',   locked:false, defaultOn:true},
   {key:'date',     label:'Date',       locked:false, defaultOn:true},
-  {key:'gws',      label:'Duration',  locked:false, defaultOn:true},
+  {key:'gws',      label:'GWS',        locked:false, defaultOn:true},
   {key:'battlefront',label:'Battlefront',locked:false,defaultOn:false},
   {key:'warzone',  label:'Warzone',    locked:false, defaultOn:false},
   {key:'checkpoint',label:'Checkpoint',locked:false, defaultOn:false},
@@ -3671,7 +3603,7 @@ setInterval(()=>{
         </div>
       </div>
       <div class="detail-field">
-        <span class="detail-field-label">Duration</span>
+        <span class="detail-field-label">GWS</span>
         <select id="detail-gws-select" class="detail-field-value">
           <option value="1">1 GWS — 1.5h</option>
           <option value="2">2 GWS — 3h</option>
