@@ -1186,10 +1186,7 @@ function processRepeatingMissions(){
     }
   });
 
-  // One-Time: roll any incomplete past-dated One-Time missions forward to today
-  state.missions.filter(m => m.type === 'One-Time' && m.status !== 'Done' && m.date && m.date < TODAYSTR).forEach(m => {
-    m.date = TODAYSTR;
-  });
+
 
   // Weekly: find weekly missions due today (blank-date missions skipped)
   state.missions.filter(m => m.type==='Weekly' && !m.templateId && m.date).forEach(m => {
