@@ -2302,7 +2302,15 @@ function buildMasterRow(m, cols, rowClass, isSel){
       </div>`;
       case 'type': return `<div style="display:flex;flex-direction:column;gap:3px;"><span class="tag ${typeColor}" style="font-size:10px;">${m.type}</span>${cdText?`<span class="countdown-badge ${cdText==='Due today'?'due-soon':''}">${cdText}</span>`:''}</div>`;
       case 'priority': return `<span class="tag ${prioColor}" style="font-size:10px;">${m.priority}</span>`;
-      case 'date': return `<span class="master-row-date" style="font-weight:600;">${m.date||'—'}</span>`;
+      case 'date': {
+        const slot = m.time ? getGwsSlot(m.time) : null;
+        const timeLabel = slot
+          ? `<span style="font-size:9px;font-family:var(--font-mono);color:var(--blue);margin-left:5px;">GWS#${slot}</span>`
+          : m.time
+            ? `<span style="font-size:9px;font-family:var(--font-mono);color:var(--tx2);margin-left:5px;">${formatTime(m.time)}</span>`
+            : '';
+        return `<span style="display:flex;align-items:center;"><span class="master-row-date" style="font-weight:600;">${m.date||'—'}</span>${timeLabel}</span>`;
+      }
       case 'gws': return `<span style="font-family:var(--font-mono);font-size:10px;color:var(--tx2);">${m.gws||1}GWS</span>`;
       case 'battlefront': return `<span style="font-size:11px;color:var(--tx2);">${m.battlefront}</span>`;
       case 'warzone': return `<span class="tag ${col.wtag}" style="font-size:10px;">${m.warzone.split(' ')[0]}</span>`;
