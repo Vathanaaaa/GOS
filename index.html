@@ -115,11 +115,11 @@ body{font-family:var(--font-body);background:var(--bg1);color:var(--tx0);min-hei
 
 /* DAILY CHECKLIST — continuous sorted list */
 .time-block{margin-bottom:0.25rem;}
-.time-header{display:flex;align-items:center;gap:10px;padding:0.5rem 0 0.25rem;margin-top:0.75rem;}
+.time-header{display:flex;align-items:center;gap:8px;padding:0.35rem 0 0.15rem;margin-top:0.5rem;}
 .time-label{font-family:var(--font-mono);font-size:11px;font-weight:500;color:var(--tx2);min-width:58px;}
 .time-divider{flex:1;height:1px;background:var(--border);}
 /* COMPACT MISSION CARD */
-.mission-card{background:var(--bg0);border:1px solid var(--border);border-radius:var(--radius);padding:0.4rem 0.75rem;margin-bottom:0.2rem;display:flex;align-items:center;gap:8px;transition:all 0.15s;cursor:default;position:relative;}
+.mission-card{background:var(--bg0);border:1px solid var(--border);border-radius:var(--radius);padding:0.28rem 0.65rem;margin-bottom:0.15rem;display:flex;align-items:center;gap:7px;transition:all 0.15s;cursor:default;position:relative;}
 .mission-card:hover{border-color:var(--border2);box-shadow:var(--shadow);}
 .mission-card.done{opacity:0.45;}
 .mission-card.pushed{border-left:3px solid var(--amber);}
@@ -130,7 +130,7 @@ body{font-family:var(--font-body);background:var(--bg1);color:var(--tx0);min-hei
 .mission-info{flex:1;min-width:0;}
 .mission-top-row{display:flex;align-items:center;gap:6px;overflow:hidden;}
 .mission-time-compact{font-family:var(--font-mono);font-size:10px;font-weight:500;color:var(--tx2);flex-shrink:0;}
-.mission-name{font-size:12.5px;font-weight:500;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
+.mission-name{font-size:12px;font-weight:500;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
 .mission-name.done{text-decoration:line-through;color:var(--tx2);}
 .mission-tags{display:flex;gap:3px;flex-shrink:0;align-items:center;}
 .mission-notes{font-size:10.5px;color:var(--tx2);margin-top:1px;line-height:1.4;}
@@ -577,18 +577,39 @@ body.light-forced .theme-toggle-knob{left:16px;background:var(--amber);}
 /* RESCHEDULE MODAL */
 .reschedule-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center;}
 .reschedule-overlay.open{display:flex;}
-.reschedule-modal{background:var(--bg0);border-radius:var(--radius-xl);border:1px solid var(--border);width:420px;max-width:94vw;box-shadow:var(--shadow-lg);overflow:hidden;}
-.reschedule-header{padding:1.125rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.reschedule-modal{background:var(--bg0);border-radius:var(--radius-xl);border:1px solid var(--border);width:780px;max-width:96vw;max-height:90vh;display:flex;flex-direction:column;box-shadow:var(--shadow-lg);overflow:hidden;}
+.reschedule-header{padding:1.125rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
 .reschedule-title{font-family:var(--font-head);font-size:14px;font-weight:600;}
-.reschedule-body{padding:1.25rem;}
+.reschedule-body{padding:1.25rem;overflow-y:auto;flex:1;}
 .reschedule-mission-name{font-size:13px;font-weight:500;color:var(--tx0);margin-bottom:1rem;padding:0.75rem;background:var(--bg1);border-radius:var(--radius);border-left:3px solid var(--amber);}
 .reschedule-field{margin-bottom:0.875rem;}
 .reschedule-field label{font-size:11px;color:var(--tx2);display:block;margin-bottom:4px;font-family:var(--font-mono);}
 .reschedule-field input,.reschedule-field select{width:100%;padding:0.45rem 0.65rem;font-size:13px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg0);color:var(--tx0);font-family:var(--font-body);}
-.reschedule-cascade-preview{background:var(--bg1);border:1px solid var(--border);border-radius:var(--radius);padding:0.75rem;margin-top:0.75rem;font-size:11px;color:var(--tx2);font-family:var(--font-mono);max-height:140px;overflow-y:auto;}
-.reschedule-cascade-item{padding:2px 0;display:flex;gap:8px;align-items:center;}
-.reschedule-cascade-arrow{color:var(--amber);}
-.reschedule-footer{padding:1rem 1.25rem;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;}
+.reschedule-fields-row{display:flex;gap:1rem;margin-bottom:0.875rem;}
+.reschedule-fields-row .reschedule-field{flex:1;margin-bottom:0;}
+.reschedule-cascade-section{margin-top:1rem;}
+.reschedule-cascade-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;}
+.reschedule-cascade-title{font-size:11px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:0.06em;font-family:var(--font-mono);}
+.reschedule-cascade-actions{display:flex;gap:8px;align-items:center;}
+.reschedule-select-all-btn{font-size:11px;padding:3px 8px;border-radius:4px;border:1px solid var(--border2);background:var(--bg1);color:var(--tx1);cursor:pointer;font-family:var(--font-body);}
+.reschedule-select-all-btn:hover{background:var(--bg2);}
+.reschedule-cascade-table{width:100%;border-collapse:collapse;font-size:12px;}
+.reschedule-cascade-table th{font-size:10px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:0.05em;font-family:var(--font-mono);padding:5px 8px;border-bottom:1px solid var(--border);text-align:left;background:var(--bg1);white-space:nowrap;}
+.reschedule-cascade-table th:first-child{border-radius:var(--radius) 0 0 0;padding-left:10px;}
+.reschedule-cascade-table th:last-child{border-radius:0 var(--radius) 0 0;}
+.reschedule-cascade-table td{padding:6px 8px;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--tx0);}
+.reschedule-cascade-table td:first-child{padding-left:10px;}
+.reschedule-cascade-table tr:last-child td{border-bottom:none;}
+.reschedule-cascade-table tr.cascade-row-checked{background:var(--blue-bg);}
+.cascade-mission-name{font-weight:500;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cascade-bf-tag{font-size:10px;background:var(--bg2);color:var(--tx1);padding:2px 6px;border-radius:3px;white-space:nowrap;}
+.cascade-arrow{color:var(--amber);font-weight:700;margin:0 4px;}
+.cascade-new-slot{color:var(--blue);font-family:var(--font-mono);font-size:11px;font-weight:500;}
+.cascade-gws4-warn{color:var(--amber);font-size:10px;}
+.reschedule-cascade-empty{padding:0.75rem;text-align:center;color:var(--green);font-size:12px;background:var(--green-bg);border-radius:var(--radius);border:1px solid var(--green-mid);}
+.reschedule-footer{padding:1rem 1.25rem;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:space-between;align-items:center;flex-shrink:0;}
+.reschedule-footer-info{font-size:11px;color:var(--tx2);font-family:var(--font-mono);}
+.reschedule-footer-btns{display:flex;gap:8px;}
 
 /* VISION DRAG-DROP */
 .vision-section[draggable]{cursor:grab;}
@@ -674,6 +695,137 @@ body.light-forced .theme-toggle-knob{left:16px;background:var(--amber);}
 .sort-apply-btn{width:100%;margin-top:0.5rem;padding:5px;border-radius:var(--radius);border:none;background:var(--blue);color:white;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font-body);}
 .sort-apply-btn:hover{opacity:0.85;}
 .sort-btn-active{background:var(--blue-bg)!important;color:var(--blue)!important;border-color:var(--blue)!important;}
+
+/* ── MASTER LIST STICKY FLAT HEADER ── */
+#view-master.active { display:flex; flex-direction:column; }
+#view-daily.active { display:flex; flex-direction:column; }
+.master-flat-sticky-wrap { position:sticky; top:53px; z-index:10; background:var(--bg0); }
+.master-col-resize-handle {
+  position:absolute; right:0; top:0; bottom:0; width:5px;
+  cursor:col-resize; z-index:2; background:transparent;
+}
+.master-col-resize-handle:hover, .master-col-resize-handle.resizing { background:var(--blue); opacity:0.5; }
+.col-header-cell {
+  position:relative; display:flex; align-items:center;
+  font-size:9px; text-transform:uppercase; letter-spacing:0.08em;
+  color:var(--tx3); font-family:var(--font-mono);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  user-select:none;
+}
+.order-input {
+  width:52px; padding:2px 5px; font-size:11px; font-family:var(--font-mono);
+  border:1px solid var(--border2); border-radius:4px;
+  background:var(--bg0); color:var(--tx1); text-align:center;
+}
+.order-input:focus { outline:none; border-color:var(--blue); }
+
+/* ── FILTER SECTION LABEL ── */
+.bf-filter-section-label {
+  font-size:9px; text-transform:uppercase; letter-spacing:0.07em;
+  color:var(--tx3); font-family:var(--font-mono);
+  padding:2px 8px 4px; margin-top:4px;
+}
+
+/* ── CHECKPOINT STYLING ── */
+.cp-style-pill {
+  display:inline-block; padding:1px 7px; border-radius:9999px;
+  font-size:10px; line-height:1.5;
+}
+
+/* ── DAILY CHECKLIST — GOOGLE CALENDAR STYLE ── */
+.daily-cal-wrap {
+  display:flex; flex-direction:column; gap:0;
+}
+.daily-cal-hour-row {
+  display:grid; grid-template-columns:52px 1fr;
+  min-height:28px; border-top:1px solid var(--border);
+  position:relative;
+}
+.daily-cal-hour-row.has-missions { min-height:auto; }
+.daily-cal-hour-row.empty-hour { min-height:28px; opacity:0.6; }
+.daily-cal-time-col {
+  font-size:10px; font-family:var(--font-mono); color:var(--tx3);
+  padding:6px 8px 0 4px; text-align:right; line-height:1;
+  flex-shrink:0; white-space:nowrap;
+}
+.daily-cal-missions-col { padding:2px 0 2px 8px; display:flex; flex-direction:column; gap:2px; }
+.daily-cal-mission-card {
+  display:flex; align-items:center; gap:8px;
+  padding:5px 10px; border-radius:6px; border-left:3px solid var(--blue);
+  background:var(--bg1); cursor:pointer; transition:background 0.12s;
+  position:relative;
+}
+.daily-cal-mission-card:hover { background:var(--bg2); }
+.daily-cal-mission-card.done { opacity:0.55; }
+.daily-cal-mission-card.pushed { border-left-color:var(--amber); }
+.daily-cal-mission-card.selected { background:var(--blue-bg); }
+.dcm-check {
+  width:14px; height:14px; border-radius:50%; border:2px solid var(--tx3);
+  flex-shrink:0; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:all 0.12s;
+}
+.dcm-check.checked { background:var(--green); border-color:var(--green); color:white; font-size:9px; }
+.dcm-name { font-size:13px; font-weight:500; flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.dcm-name.done { text-decoration:line-through; color:var(--tx3); }
+.dcm-hour-label { font-size:10px; color:var(--tx3); font-family:var(--font-mono); white-space:nowrap; }
+.dcm-tags { display:flex; gap:4px; align-items:center; flex-wrap:nowrap; margin-left:auto; }
+.dcm-right { display:flex; gap:4px; align-items:center; flex-shrink:0; }
+.daily-empty-hour-line {
+  display:grid; grid-template-columns:52px 1fr;
+  min-height:24px; border-top:1px solid var(--border);
+  align-items:center;
+}
+.daily-empty-hour-label { font-size:9px; font-family:var(--font-mono); color:var(--tx3); padding:0 8px 0 4px; text-align:right; }
+
+/* ── DAILY HEADER STATS ROW ── */
+.daily-stats-row {
+  display:flex; gap:8px; align-items:stretch;
+  padding:0;
+  background:var(--bg1); flex-shrink:0;
+  position:sticky; top:53px; z-index:12;
+  border-bottom:1px solid var(--border);
+  border-radius:12px;
+  margin-bottom:0;
+}
+.daily-stat-chip {
+  flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:2px; background:var(--bg0); border:1px solid var(--border);
+  border-radius:12px; padding:8px 6px; min-height:56px;
+}
+.daily-stat-chip strong {
+  color:var(--tx0); font-size:20px; font-weight:700;
+  font-family:var(--font-head); line-height:1;
+}
+.daily-stat-chip span { font-size:10px; color:var(--tx2); white-space:nowrap; }
+.daily-stat-sep { display:none; }
+.daily-progress-inline {
+  flex:3; display:flex; flex-direction:column; align-items:stretch; justify-content:center;
+  gap:6px; background:var(--bg0); border:1px solid var(--border);
+  border-radius:12px; padding:10px 16px; min-height:56px;
+}
+.daily-progress-inline .progress-bar-bg { flex:none; height:7px; border-radius:4px; }
+.daily-progress-pct {
+  font-size:20px; font-weight:700; font-family:var(--font-head);
+  color:var(--tx0); line-height:1;
+}
+.daily-progress-label { font-size:10px; color:var(--tx2); }
+
+
+/* ── CONTEXT MENU COLOR PICKER ── */
+.ctx-color-item { flex-direction:column; align-items:flex-start !important; gap:6px; cursor:default; }
+.ctx-color-item:hover { background:var(--bg1) !important; }
+.ctx-color-palette { display:flex; gap:5px; flex-wrap:wrap; padding:2px 0; }
+.ctx-color-swatch {
+  width:18px; height:18px; border-radius:50%; cursor:pointer;
+  border:2px solid transparent; transition:transform 0.1s, border-color 0.1s;
+  flex-shrink:0;
+}
+.ctx-color-swatch:hover { transform:scale(1.2); border-color:var(--tx0); }
+.ctx-color-clear {
+  background:var(--bg2) !important; color:var(--tx2);
+  font-size:10px; display:flex; align-items:center; justify-content:center;
+  border:1px solid var(--border2) !important;
+}
 </style>
 </head>
 <body>
@@ -718,18 +870,7 @@ body.light-forced .theme-toggle-knob{left:16px;background:var(--amber);}
       OODA Loop
     </div>
   </div>
-  <div class="nav-section" style="margin-top:0.25rem;">
-    <div class="nav-label">Warzones</div>
-    <div class="nav-item" onclick="switchView('warzones');filterWarzone('Money Making')">
-      <span class="nav-dot dot-red"></span> Money Making
-    </div>
-    <div class="nav-item" onclick="switchView('warzones');filterWarzone('Self-Improvement')">
-      <span class="nav-dot dot-blue"></span> Self-Improvement
-    </div>
-    <div class="nav-item" onclick="switchView('warzones');filterWarzone('Family & Relationship')">
-      <span class="nav-dot dot-green"></span> Family & Relationship
-    </div>
-  </div>
+
   <div class="nav-bottom">
     <button class="sidebar-btn" onclick="openMissionModal(null)">+ Add Mission</button>
     <button class="sidebar-btn" onclick="openCsvModal()">⬆ Import CSV</button>
@@ -768,29 +909,26 @@ body.light-forced .theme-toggle-knob{left:16px;background:var(--amber);}
 
     <!-- DAILY VIEW -->
     <div class="view active" id="view-daily">
-      <div class="metrics-row">
-        <div class="metric-card">
-          <div class="metric-label">Missions Today</div>
-          <div class="metric-value" id="metric-today">0</div>
-          <div class="metric-sub">scheduled</div>
+      <div class="daily-stats-row" id="daily-stats-row">
+        <div class="daily-stat-chip">
+          <strong id="metric-today">0</strong>
+          <span>Missions Today</span>
         </div>
-        <div class="metric-card">
-          <div class="metric-label">Completed</div>
-          <div class="metric-value" id="metric-done">0</div>
-          <div class="metric-sub">missions done</div>
+        <div class="daily-stat-chip">
+          <strong id="metric-done">0</strong>
+          <span>Completed</span>
         </div>
-        <div class="metric-card">
-          <div class="metric-label">GWS Needed</div>
-          <div class="metric-value" id="metric-gws">0</div>
-          <div class="metric-sub">sessions (~1.5h each)</div>
+        <div class="daily-stat-chip">
+          <strong id="metric-gws">0</strong>
+          <span>GWS Needed</span>
         </div>
-      </div>
-      <div class="progress-strip">
-        <div class="progress-strip-label">
-          <span>Today's Progress</span>
-          <span id="progress-pct-text" style="font-family:var(--font-mono);font-weight:500;">0%</span>
+        <div class="daily-progress-inline">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;">
+            <span class="daily-progress-label">Today's Progress</span>
+            <span class="daily-progress-pct" id="progress-pct-text">0%</span>
+          </div>
+          <div class="progress-bar-bg"><div class="progress-bar-fill" id="overall-bar" style="width:0%"></div></div>
         </div>
-        <div class="progress-bar-bg"><div class="progress-bar-fill" id="overall-bar" style="width:0%"></div></div>
       </div>
       <div id="daily-list"></div>
       <div id="pushed-section"></div>
@@ -826,20 +964,20 @@ body.light-forced .theme-toggle-knob{left:16px;background:var(--amber);}
       </div>
       <div class="master-topbar">
         <input type="text" class="master-search" id="master-search" placeholder="Search missions..." oninput="renderMaster()">
-        <div class="master-filter-group" id="master-warzone-filters">
-          <button class="filter-btn active" data-wz="all" onclick="setMasterWz('all')">All</button>
-          <button class="filter-btn" data-wz="Money Making" onclick="setMasterWz('Money Making')">💰 Money</button>
-          <button class="filter-btn" data-wz="Self-Improvement" onclick="setMasterWz('Self-Improvement')">🧠 Self</button>
-          <button class="filter-btn" data-wz="Family & Relationship" onclick="setMasterWz('Family & Relationship')">💚 Family</button>
-        </div>
+
         <div class="bf-filter-wrapper">
           <button class="filter-btn" id="bf-filter-btn" onclick="toggleBfFilterPanel()">⊟ Filter</button>
           <div class="bf-filter-panel" id="bf-filter-panel">
-            <div class="bf-filter-panel-header">
-              <span>Battlefront</span>
-              <button onclick="clearBfFilter()">Clear</button>
+            <div class="bf-filter-panel-header" style="justify-content:space-between;">
+              <span style="font-weight:600;">Filters</span>
+              <button onclick="clearAllFilters()">Clear All</button>
             </div>
+            <div class="bf-filter-section-label">Warzone</div>
+            <div id="wz-filter-options"></div>
+            <div class="bf-filter-section-label" style="margin-top:8px;">Battlefront</div>
             <div id="bf-filter-options"></div>
+            <div class="bf-filter-section-label" style="margin-top:8px;">Checkpoint</div>
+            <div id="cp-filter-options"></div>
           </div>
         </div>
         <div class="master-filter-group">
@@ -857,9 +995,10 @@ body.light-forced .theme-toggle-knob{left:16px;background:var(--amber);}
                 <option value="name">Mission name</option>
                 <option value="priority">Priority</option>
                 <option value="type">Type</option>
-                <option value="gws">GWS</option>
+                <option value="gws">Duration</option>
                 <option value="status">Status</option>
                 <option value="battlefront">Battlefront</option>
+              <option value="order">Task Order</option>
               </select>
             </div>
             <div class="sort-row">
@@ -955,7 +1094,7 @@ body.light-forced .theme-toggle-knob{left:16px;background:var(--amber);}
     </div>
     <div class="modal-field"><label>Start Date</label><input type="date" id="m-date"/></div>
     <div class="modal-field"><label>Scheduled Time (optional)</label><input type="time" id="m-time" placeholder="e.g. 08:00"/></div>
-    <div class="modal-field"><label>GWS Required</label>
+    <div class="modal-field"><label>Duration</label>
       <select id="m-gws">
         <option value="1">1 GWS (~1.5h)</option>
         <option value="2">2 GWS (~3h)</option>
@@ -971,7 +1110,7 @@ body.light-forced .theme-toggle-knob{left:16px;background:var(--amber);}
   </div>
 </div>
 
-<!-- RESCHEDULE MODAL (replaces old push modal) -->
+<!-- RESCHEDULE MODAL -->
 <div class="reschedule-overlay" id="reschedule-overlay" onclick="if(event.target===this)closeReschedule()">
   <div class="reschedule-modal">
     <div class="reschedule-header">
@@ -980,25 +1119,38 @@ body.light-forced .theme-toggle-knob{left:16px;background:var(--amber);}
     </div>
     <div class="reschedule-body">
       <div class="reschedule-mission-name" id="reschedule-mission-name">Mission name</div>
-      <div class="reschedule-field">
-        <label>New Date</label>
-        <input type="date" id="reschedule-date">
+      <div class="reschedule-fields-row">
+        <div class="reschedule-field">
+          <label>NEW DATE</label>
+          <input type="date" id="reschedule-date" onchange="previewReschedule()">
+        </div>
+        <div class="reschedule-field">
+          <label>GWS SLOT</label>
+          <select id="reschedule-gws-slot" onchange="previewReschedule()">
+            <option value="1">GWS #1 — 08:00</option>
+            <option value="2">GWS #2 — 10:00</option>
+            <option value="3">GWS #3 — 13:00</option>
+            <option value="4">GWS #4 — 15:00</option>
+          </select>
+        </div>
       </div>
-      <div class="reschedule-field">
-        <label>GWS Slot</label>
-        <select id="reschedule-gws-slot">
-          <option value="1">GWS #1 — 08:00 to 09:45</option>
-          <option value="2">GWS #2 — 10:00 to 11:45</option>
-          <option value="3">GWS #3 — 13:00 to 14:45</option>
-          <option value="4">GWS #4 — 15:00 to 16:45</option>
-        </select>
+      <div class="reschedule-cascade-section" id="reschedule-cascade-section" style="display:none;">
+        <div class="reschedule-cascade-header">
+          <span class="reschedule-cascade-title">Cascade Preview — select missions to shift</span>
+          <div class="reschedule-cascade-actions">
+            <button class="reschedule-select-all-btn" id="reschedule-select-all-btn" onclick="toggleSelectAllCascade()">Select All</button>
+          </div>
+        </div>
+        <div id="reschedule-cascade-table-wrap"></div>
+        <div id="reschedule-cascade-gws4-warn" style="display:none;margin-top:8px;font-size:11px;color:#92400E;background:#FEF3C7;border:1px solid #FCD34D;border-radius:4px;padding:6px 8px;">⚠ One or more missions will land on GWS #4 (your reserved weekday slot).</div>
       </div>
-      <div id="reschedule-cascade-preview" class="reschedule-cascade-preview" style="display:none;"></div>
     </div>
     <div class="reschedule-footer">
-      <button class="btn" onclick="closeReschedule()">Cancel</button>
-      <button class="btn btn-primary" onclick="previewReschedule()" id="reschedule-preview-btn">Preview Cascade</button>
-      <button class="btn btn-primary" onclick="confirmReschedule()" id="reschedule-confirm-btn" style="display:none;">Apply</button>
+      <span class="reschedule-footer-info" id="reschedule-footer-info"></span>
+      <div class="reschedule-footer-btns">
+        <button class="btn" onclick="closeReschedule()">Cancel</button>
+        <button class="btn btn-primary" onclick="confirmReschedule()">Apply</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1144,7 +1296,9 @@ const DEFAULT_STATE = {
   oodaEntries:[],
 };
 
+// Ensure cpStyles exists on loaded state
 let state = JSON.parse(localStorage.getItem('gos_v4')||'null') || JSON.parse(JSON.stringify(DEFAULT_STATE));
+if(!state.cpStyles) state.cpStyles = {};
 
 // Migrate from older storage keys
 if(!state.visionGoals) state.visionGoals=[];
@@ -1154,6 +1308,55 @@ if(!state.visionTargets) state.visionTargets=[];
 if(state.visionQuote===undefined) state.visionQuote=DEFAULT_STATE.visionQuote;
 
 function save(){localStorage.setItem('gos_v4',JSON.stringify(state));}
+
+function getCpStyle(name){
+  if(!name || !state.cpStyles || !state.cpStyles[name]) return null;
+  return state.cpStyles[name]; // {color, bg, bold}
+}
+
+function renderCpTag(name){
+  if(!name) return '';
+  const s = getCpStyle(name);
+  if(!s) return `<span style="font-size:10px;color:var(--tx2);">📍 ${name}</span>`;
+  const color = s.color || 'var(--tx0)';
+  const bg = s.bg || 'transparent';
+  const fw = s.bold ? '700' : '400';
+  const pad = s.bg ? '1px 6px' : '0';
+  const radius = s.bg ? '4px' : '0';
+  return `<span style="font-size:10px;color:${color};background:${bg};font-weight:${fw};padding:${pad};border-radius:${radius};">📍 ${name}</span>`;
+}
+
+function openCpStyleModal(name){
+  if(!name) return;
+  const s = (state.cpStyles && state.cpStyles[name]) || {};
+  document.getElementById('cp-style-name').textContent = name;
+  document.getElementById('cp-style-color').value = s.color || '#888784';
+  document.getElementById('cp-style-bg').value = s.bg || '#ffffff';
+  document.getElementById('cp-style-bold').checked = !!s.bold;
+  document.getElementById('cp-style-use-bg').checked = !!s.bg;
+  document.getElementById('cp-style-modal').classList.add('open');
+}
+
+function saveCpStyle(){
+  const name = document.getElementById('cp-style-name').textContent;
+  if(!state.cpStyles) state.cpStyles = {};
+  state.cpStyles[name] = {
+    color: document.getElementById('cp-style-color').value,
+    bg: document.getElementById('cp-style-use-bg').checked ? document.getElementById('cp-style-bg').value : null,
+    bold: document.getElementById('cp-style-bold').checked
+  };
+  save();
+  document.getElementById('cp-style-modal').classList.remove('open');
+  renderAll();
+}
+
+function clearCpStyle(){
+  const name = document.getElementById('cp-style-name').textContent;
+  if(state.cpStyles) delete state.cpStyles[name];
+  save();
+  document.getElementById('cp-style-modal').classList.remove('open');
+  renderAll();
+}
 function getColors(wz){
   if(wz==='Money Making') return {fill:'bf-fill-red',badge:'wz-badge-red',wtag:'tag-red'};
   if(wz==='Self-Improvement') return {fill:'bf-fill-blue',badge:'wz-badge-blue',wtag:'tag-blue'};
@@ -1307,11 +1510,9 @@ function getNextOccurrenceText(m){
 
 // ── DAILY VIEW ──
 function renderDaily(){
-  // Daily missions: show today's copies (those with date===TODAYSTR)
   const todayMs = state.missions.filter(m => m.date === TODAYSTR && m.status !== 'Done');
   const doneTodayMs = state.missions.filter(m => m.date === TODAYSTR && m.status === 'Done');
   const allToday = [...todayMs,...doneTodayMs];
-  // Pushed: only One-Time and Weekly/Monthly that are overdue and not done
   const pushed = state.missions.filter(m =>
     m.date && m.date < TODAYSTR && m.status !== 'Done' && m.type !== 'Daily'
   );
@@ -1331,13 +1532,10 @@ function renderDaily(){
     const[h,m]=(t||'00:00').split(':').map(Number);
     return h*60+(m||0);
   }
-  const sorted=[...allToday].sort((a,b)=>{
-    const ta=timeToMins(a.time||autoAssignTime(a));
-    const tb=timeToMins(b.time||autoAssignTime(b));
-    return ta-tb;
-  });
 
+  const sorted=[...allToday].sort((a,b)=>timeToMins(a.time||autoAssignTime(a))-timeToMins(b.time||autoAssignTime(b)));
   const container=document.getElementById('daily-list');
+
   if(!sorted.length){
     container.innerHTML='<div class="empty-state">No missions scheduled for today.<br>Add a mission to get started.</div>';
   } else {
@@ -1361,6 +1559,39 @@ function renderDaily(){
   } else { pc.innerHTML=''; }
 }
 
+function buildCalMissionCard(m,isPushed){
+  const isDone=m.status==='Done';
+  const t=m.time||autoAssignTime(m);
+  const typeColor=m.type==='One-Time'?'tag-red':m.type==='Daily'?'tag-blue':m.type==='Weekly'?'tag-amber':'tag-green';
+  const nextOcc=getNextOccurrenceText(m);
+  const isDailySel=dailySelectedMissions.has(m.id);
+  const customColor=m.color||null;
+  const borderColor=customColor||'var(--blue)';
+  const bgColor=customColor ? customColor+'22' : isPushed ? 'var(--amber-bg)' : 'var(--bg1)';
+  return `<div class="daily-cal-mission-card ${isDone?'done':''} ${isPushed?'pushed':''} ${isDailySel?'selected':''}" id="mc-${m.id}"
+    style="border-left-color:${borderColor};background:${bgColor};"
+    oncontextmenu="openCtxMenu(event,${m.id},'daily')"
+    ontouchstart="startLongPress(event,${m.id},'daily')"
+    ontouchend="cancelLongPress()" ontouchmove="cancelLongPress()"
+    onclick="event.stopPropagation();dailySelectMode?toggleDailySelect(${m.id},event):openDetailModal(${m.id})">
+    <div class="dcm-check ${isDone?'checked':''}" onclick="event.stopPropagation();toggleMission(${m.id})">${isDone?'✓':''}</div>
+    <div class="dcm-name ${isDone?'done':''}">${m.name}</div>
+    <div class="dcm-tags">
+      ${m.checkpoint?renderCpTag(m.checkpoint):''}
+      <span class="tag ${typeColor}" style="font-size:9px;">${m.type}</span>
+      ${m.priority==='Critical'?'<span class="tag tag-critical" style="font-size:9px;">!</span>':''}
+      ${isPushed?'<span class="tag tag-amber" style="font-size:9px;">Pushed</span>':''}
+      ${nextOcc?`<span class="next-occurrence ${nextOcc.soon?'soon':''}" style="font-size:9px;">↻ ${nextOcc.text}</span>`:''}
+    </div>
+    <div class="dcm-right">
+      <span class="gws-badge" style="font-size:10px;">⏱${m.gws||1}G</span>
+      ${isPushed?`<button class="push-btn" onclick="event.stopPropagation();moveToToday(${m.id})">→ Today</button>`:''}
+      ${!isDone?`<button class="reschedule-btn" onclick="event.stopPropagation();askPush(${m.id})">↷</button>`:''}
+      <button class="icon-btn del-btn" onclick="event.stopPropagation();deleteMission(${m.id})" title="Delete">×</button>
+    </div>
+  </div>`;
+}
+
 function formatTime(t){
   if(!t) return '';
   const [h,m]=t.split(':').map(Number);
@@ -1377,9 +1608,10 @@ function buildMissionCard(m,isPushed){
   const cdText=getCountdownText(m);
   const nextOcc=getNextOccurrenceText(m);
   const nextOccHtml=nextOcc?`<span class="next-occurrence ${nextOcc.soon?'soon':''}" style="font-size:9px;padding:1px 5px;">↻ ${nextOcc.text}</span>`:'';
-  const currentSlot=getGwsSlot(t)||1;
   const isDailySel = dailySelectedMissions.has(m.id);
+  const colorStyle = m.color ? `border-left:3px solid ${m.color};` : '';
   return `<div class="mission-card ${isDone?'done':''} ${isPushed?'pushed':''} ${isDailySel?'selected':''}" id="mc-${m.id}"
+    style="${colorStyle}"
     oncontextmenu="openCtxMenu(event,${m.id},'daily')"
     ontouchstart="startLongPress(event,${m.id},'daily')"
     ontouchend="cancelLongPress()" ontouchmove="cancelLongPress()">
@@ -1400,10 +1632,10 @@ function buildMissionCard(m,isPushed){
       ${m.notes?`<div class="mission-notes">${m.notes}</div>`:''}
     </div>
     <div class="mission-right">
-      <span class="gws-badge">⏱${m.gws}G</span>
-      ${isPushed?`<button class="push-btn" onclick="moveToToday(${m.id})">→ Today</button>`:''}
-      ${!isDone?`<button class="reschedule-btn" onclick="event.stopPropagation();askPush(${m.id})">↷ Reschedule</button>`:''}
-      <button class="icon-btn del-btn" onclick="deleteMission(${m.id})" title="Delete">×</button>
+      <span class="gws-badge">⏱${m.gws||1}G</span>
+      ${isPushed?`<button class="push-btn" onclick="event.stopPropagation();moveToToday(${m.id})">→ Today</button>`:''}
+      ${!isDone?`<button class="reschedule-btn" onclick="event.stopPropagation();askPush(${m.id})">↷</button>`:''}
+      <button class="icon-btn del-btn" onclick="event.stopPropagation();deleteMission(${m.id})" title="Delete">×</button>
     </div>
   </div>`;
 }
@@ -1503,9 +1735,43 @@ function getGwsSlot(time){
 }
 function gwsStartTime(slot){ return GWS_SLOTS[slot]?GWS_SLOTS[slot].start:null; }
 
-// ── NEW RESCHEDULE LOGIC ──
+// ── RESCHEDULE & CASCADE LOGIC ──
 let rescheduleMissionId=null;
-let reschedulePreviewData=null;
+let reschedulePreviewData=null; // {targetDate, targetSlot, mission, cascadeChanges:[{mission,newSlot,newDate,isGws4,id}]}
+
+function localDateStr(d){
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+// Is a given date string a weekday (Mon-Fri)?
+function isWeekday(dateStr){
+  const d = new Date(dateStr+'T00:00:00');
+  const day = d.getDay(); // 0=Sun, 6=Sat
+  return day >= 1 && day <= 5;
+}
+
+// Max allowed slot for a given date (GWS#4 blocked on weekdays)
+function maxSlotForDate(dateStr){
+  return isWeekday(dateStr) ? 3 : 4;
+}
+
+// Given a date string, advance by N GWS-duration slots, respecting weekday GWS#4 rule.
+// duration = mission.gws (1 or 2 slots wide). Returns {date, slot}.
+function advanceByDuration(dateStr, slot, duration){
+  let d = dateStr;
+  let s = slot;
+  for(let i=0; i<duration; i++){
+    s++;
+    if(s > maxSlotForDate(d)){
+      // spill to next day slot 1
+      const next = new Date(d+'T00:00:00');
+      next.setDate(next.getDate()+1);
+      d = localDateStr(next);
+      s = 1;
+    }
+  }
+  return {date:d, slot:s};
+}
 
 function askPush(id){
   rescheduleMissionId=id;
@@ -1513,39 +1779,18 @@ function askPush(id){
   const m=state.missions.find(x=>x.id===id);
   if(!m) return;
   document.getElementById('reschedule-mission-name').textContent=m.name;
-  // Default to tomorrow
   const tomorrow=new Date(TODAY); tomorrow.setDate(tomorrow.getDate()+1);
   document.getElementById('reschedule-date').value=localDateStr(tomorrow);
   document.getElementById('reschedule-gws-slot').value='1';
-  document.getElementById('reschedule-cascade-preview').style.display='none';
-  document.getElementById('reschedule-preview-btn').style.display='';
-  document.getElementById('reschedule-confirm-btn').style.display='none';
+  document.getElementById('reschedule-cascade-section').style.display='none';
+  document.getElementById('reschedule-footer-info').textContent='';
   document.getElementById('reschedule-overlay').classList.add('open');
+  previewReschedule();
 }
 
 function closeReschedule(){
   document.getElementById('reschedule-overlay').classList.remove('open');
   rescheduleMissionId=null; reschedulePreviewData=null;
-}
-
-// Reset preview when inputs change
-document.addEventListener('change', e=>{
-  if(e.target.id==='reschedule-date'||e.target.id==='reschedule-gws-slot'){
-    document.getElementById('reschedule-cascade-preview').style.display='none';
-    document.getElementById('reschedule-preview-btn').style.display='';
-    document.getElementById('reschedule-confirm-btn').style.display='none';
-    reschedulePreviewData=null;
-  }
-});
-
-function localDateStr(d){
-  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-}
-
-function slotToMinutes(dateStr, slot){
-  // Convert a date+slot to a comparable number: days * 1000 + slot
-  const d = new Date(dateStr+'T00:00:00');
-  return d.getTime() / 86400000 * 10 + slot;
 }
 
 function previewReschedule(){
@@ -1554,90 +1799,168 @@ function previewReschedule(){
   if(!m) return;
   const targetDate=document.getElementById('reschedule-date').value;
   const targetSlot=parseInt(document.getElementById('reschedule-gws-slot').value);
-  if(!targetDate){alert('Please select a date.');return;}
+  if(!targetDate) return;
 
-  const origDate = m.date;
-  const origSlot = getGwsSlot(m.time||autoAssignTime(m)) || 1;
-  const origScore = slotToMinutes(origDate, origSlot);
-  const targetScore = slotToMinutes(targetDate, targetSlot);
-  const slotDelta = targetScore - origScore; // positive = moving later, negative = earlier
+  // ── NEW CASCADE ALGORITHM ──
+  // Rule: Today's missions are NEVER affected.
+  // For future days (starting from targetDate): missions on those days shift
+  // by exactly Mission A's duration (in GWS slots), chaining day by day.
+  // Only One-Time missions shift. Weekly/Monthly/Daily stay fixed.
 
-  // Find all incomplete One-Time missions AFTER the original position
-  // "after" = same date + slot > origSlot, OR date > origDate
-  const toShift = state.missions.filter(x => {
-    if(x.id === rescheduleMissionId || x.status === 'Done') return false;
-    if(x.type === 'Weekly' || x.type === 'Monthly' || x.type === 'Daily') return false;
-    const xSlot = getGwsSlot(x.time||autoAssignTime(x)) || 1;
-    const xScore = slotToMinutes(x.date, xSlot);
-    return xScore > origScore;
+  const mDuration = parseInt(m.gws) || 1; // how many slots Mission A occupies
+
+  // Collect all incomplete One-Time missions on future days (> today),
+  // excluding Mission A itself, sorted by date then slot.
+  const futureMissions = state.missions
+    .filter(x => {
+      if(x.id === rescheduleMissionId || x.status === 'Done') return false;
+      if(x.type !== 'One-Time') return false;
+      if(!x.date || x.date <= TODAYSTR) return false; // today and past untouched
+      return true;
+    })
+    .map(x => ({
+      mission: x,
+      origDate: x.date,
+      origSlot: getGwsSlot(x.time || autoAssignTime(x)) || 1
+    }))
+    .sort((a,b) => {
+      if(a.origDate !== b.origDate) return a.origDate < b.origDate ? -1 : 1;
+      return a.origSlot - b.origSlot;
+    });
+
+  // For each future mission, shift forward by mDuration slots.
+  // advanceByDuration handles weekday GWS#4 blocking and day spillover.
+  const cascadeChanges = futureMissions.map((entry, idx) => {
+    const {date: newDate, slot: newSlot} = advanceByDuration(entry.origDate, entry.origSlot - 1, mDuration);
+    // We shift the slot position: origSlot + duration, spilling as needed
+    // Actually: we want to push each mission forward by mDuration slots from its current position
+    const {date: nd, slot: ns} = advanceByDuration(entry.origDate, entry.origSlot - 1 + (mDuration - 1), 1);
+    // Simpler: just add mDuration slots from (origDate, origSlot)
+    let tempDate = entry.origDate;
+    let tempSlot = entry.origSlot;
+    for(let i=0; i<mDuration; i++){
+      tempSlot++;
+      if(tempSlot > maxSlotForDate(tempDate)){
+        const next = new Date(tempDate+'T00:00:00');
+        next.setDate(next.getDate()+1);
+        tempDate = localDateStr(next);
+        tempSlot = 1;
+      }
+    }
+    const isGws4 = tempSlot === 4 && isWeekday(tempDate);
+    return {
+      id: 'cascade-'+idx,
+      mission: entry.mission,
+      origDate: entry.origDate,
+      origSlot: entry.origSlot,
+      newDate: tempDate,
+      newSlot: tempSlot,
+      isGws4
+    };
   });
 
-  // Calculate new position for each: shift by slotDelta
-  // Each slot = 1 unit; days = 10 units per day (slots 1-4 per day, skip GWS#4 warning)
-  const cascadeChanges = [];
-  const gws4warnings = [];
+  reschedulePreviewData = {targetDate, targetSlot, mission:m, cascadeChanges};
 
-  toShift.forEach(x => {
-    const xSlot = getGwsSlot(x.time||autoAssignTime(x)) || 1;
-    const xScore = slotToMinutes(x.date, xSlot);
-    let newScore = xScore + slotDelta;
-
-    // Convert newScore back to date + slot
-    let newDay = Math.floor(newScore / 10);
-    let newSlot = Math.round(newScore % 10);
-    if(newSlot < 1) { newDay--; newSlot = 4; }
-    if(newSlot > 4) { newDay++; newSlot = 1; }
-    newSlot = Math.max(1, Math.min(4, newSlot));
-
-    const newDate = localDateStr(new Date(newDay * 86400000));
-    const isGws4 = newSlot === 4;
-    if(isGws4) gws4warnings.push(x.name);
-    cascadeChanges.push({mission:x, newSlot, newDate, isGws4});
-  });
-
-  reschedulePreviewData={targetDate, targetSlot, cascadeChanges, mission:m, slotDelta};
-
-  const preview=document.getElementById('reschedule-cascade-preview');
-  const gws4warn = gws4warnings.length ? `<div style="margin-top:6px;padding:6px 8px;background:#FEF3C7;border:1px solid #FCD34D;border-radius:4px;font-size:10px;color:#92400E;">⚠ ${gws4warnings.length} task(s) will land on GWS #4 (your reserved slot): ${gws4warnings.slice(0,3).join(', ')}${gws4warnings.length>3?'…':''}</div>` : '';
+  // Render cascade table
+  const section = document.getElementById('reschedule-cascade-section');
+  const wrap = document.getElementById('reschedule-cascade-table-wrap');
+  const gws4warn = document.getElementById('reschedule-cascade-gws4-warn');
+  const footerInfo = document.getElementById('reschedule-footer-info');
 
   if(!cascadeChanges.length){
-    preview.innerHTML=`<div style="color:var(--green);">✓ No other tasks to shift.</div>`;
+    wrap.innerHTML = '<div class="reschedule-cascade-empty">✓ No future missions to shift.</div>';
+    gws4warn.style.display='none';
   } else {
-    preview.innerHTML=
-      `<div style="color:var(--tx2);margin-bottom:8px;font-size:11px;">${cascadeChanges.length} task(s) will be affected. Move them too?</div>`+
-      `<div style="display:flex;gap:8px;margin-bottom:8px;">
-        <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;"><input type="radio" name="cascade-choice" value="yes"> Yes, shift all</label>
-        <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;"><input type="radio" name="cascade-choice" value="no" checked> No, keep fixed</label>
-      </div>`+
-      `<div style="max-height:140px;overflow-y:auto;">`+
-      cascadeChanges.map(ch=>`<div class="reschedule-cascade-item">
-        <span class="reschedule-cascade-arrow">→</span>
-        <span style="flex:1;font-size:11px;">${ch.mission.name}</span>
-        <span style="color:var(--amber);font-size:10px;">${ch.isGws4?'<span class="gws4-warn">GWS#4 ⚠</span> ':''} GWS#${ch.newSlot} · ${ch.newDate}</span>
-      </div>`).join('')+
-      `</div>${gws4warn}`;
+    const hasGws4 = cascadeChanges.some(c=>c.isGws4);
+    gws4warn.style.display = hasGws4 ? 'block' : 'none';
+    wrap.innerHTML = `
+      <table class="reschedule-cascade-table">
+        <thead>
+          <tr>
+            <th style="width:32px;"></th>
+            <th>Mission</th>
+            <th>Battlefront</th>
+            <th>Duration</th>
+            <th>Current</th>
+            <th>→ New</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${cascadeChanges.map(ch => `
+            <tr id="crow-${ch.id}" class="">
+              <td><input type="checkbox" id="chk-${ch.id}" onchange="updateCascadeRow('${ch.id}')"></td>
+              <td><div class="cascade-mission-name" title="${ch.mission.name}">${ch.mission.name}</div></td>
+              <td><span class="cascade-bf-tag">${ch.mission.battlefront||'—'}</span></td>
+              <td style="font-family:var(--font-mono);font-size:11px;color:var(--tx2);">${ch.mission.gws||1}G</td>
+              <td style="font-family:var(--font-mono);font-size:11px;color:var(--tx2);">GWS#${ch.origSlot} · ${ch.origDate}</td>
+              <td>
+                <span class="cascade-new-slot">GWS#${ch.newSlot}${ch.isGws4?` <span class="cascade-gws4-warn">⚠</span>`:''}</span>
+                <span style="font-family:var(--font-mono);font-size:11px;color:var(--tx2);margin-left:4px;">${ch.newDate}</span>
+              </td>
+            </tr>`).join('')}
+        </tbody>
+      </table>`;
   }
-  preview.style.display='block';
-  document.getElementById('reschedule-preview-btn').style.display='none';
-  document.getElementById('reschedule-confirm-btn').style.display='';
+  section.style.display='block';
+  updateCascadeSelectAllBtn();
+  updateFooterInfo();
+}
+
+function updateCascadeRow(id){
+  const chk = document.getElementById('chk-'+id);
+  const row = document.getElementById('crow-'+id);
+  if(chk && row) row.classList.toggle('cascade-row-checked', chk.checked);
+  updateCascadeSelectAllBtn();
+  updateFooterInfo();
+}
+
+function toggleSelectAllCascade(){
+  if(!reschedulePreviewData) return;
+  const allChks = reschedulePreviewData.cascadeChanges.map(ch=>document.getElementById('chk-'+ch.id)).filter(Boolean);
+  const allChecked = allChks.every(c=>c.checked);
+  allChks.forEach(c=>{
+    c.checked = !allChecked;
+    const row=document.getElementById('crow-'+c.id.replace('chk-',''));
+    if(row) row.classList.toggle('cascade-row-checked',!allChecked);
+  });
+  updateCascadeSelectAllBtn();
+  updateFooterInfo();
+}
+
+function updateCascadeSelectAllBtn(){
+  if(!reschedulePreviewData) return;
+  const allChks = reschedulePreviewData.cascadeChanges.map(ch=>document.getElementById('chk-'+ch.id)).filter(Boolean);
+  if(!allChks.length) return;
+  const allChecked = allChks.every(c=>c.checked);
+  const btn = document.getElementById('reschedule-select-all-btn');
+  if(btn) btn.textContent = allChecked ? 'Deselect All' : 'Select All';
+}
+
+function updateFooterInfo(){
+  if(!reschedulePreviewData) return;
+  const checked = reschedulePreviewData.cascadeChanges.filter(ch=>{
+    const c=document.getElementById('chk-'+ch.id); return c&&c.checked;
+  }).length;
+  const total = reschedulePreviewData.cascadeChanges.length;
+  const el=document.getElementById('reschedule-footer-info');
+  if(el) el.textContent = total ? `${checked} of ${total} missions selected to shift` : '';
 }
 
 function confirmReschedule(){
   if(!reschedulePreviewData) return;
   saveUndo();
-  const {targetDate, targetSlot, cascadeChanges, mission}=reschedulePreviewData;
-  const cascadeRadio = document.querySelector('input[name="cascade-choice"]:checked');
-  const doCascade = !cascadeRadio || cascadeRadio.value === 'yes';
+  const {targetDate, targetSlot, mission, cascadeChanges}=reschedulePreviewData;
   mission.date=targetDate;
   mission.time=gwsStartTime(targetSlot);
   mission.status='To Do';
-  if(doCascade){
-    cascadeChanges.forEach(ch=>{
+  cascadeChanges.forEach(ch=>{
+    const chk=document.getElementById('chk-'+ch.id);
+    if(chk && chk.checked){
       ch.mission.date=ch.newDate;
       ch.mission.time=gwsStartTime(ch.newSlot);
-    });
-  }
-  save(); closeReschedule(); renderDaily(); renderCalendar(); renderMaster();
+    }
+  });
+  save(); closeReschedule(); renderAll();
 }
 
 // Keep old names as aliases so nothing else breaks
@@ -1728,7 +2051,8 @@ function renderWarzones(){
           ${bf.goal?`<div style="font-size:12px;color:var(--tx1);margin-bottom:0.625rem;padding:0.5rem 0.75rem;background:var(--bg0);border-radius:var(--radius);border:1px solid var(--border);line-height:1.5;"><strong>Goal:</strong> ${bf.goal}</div>`:''}
           ${cps.map(cp=>`<div class="cp-item">
             <div class="cp-check ${cp.done?'done':''}" onclick="toggleCheckpoint(${cp.id})"></div>
-            <span class="cp-text ${cp.done?'done':''}">${cp.name}</span>
+            <span class="cp-text ${cp.done?'done':''}">${renderCpTag(cp.name)||cp.name}</span>
+            <button class="icon-btn" style="font-size:10px;padding:1px 5px;margin-left:4px;opacity:0.6;" onclick="event.stopPropagation();openCpStyleModal('${cp.name}')" title="Style checkpoint">🎨</button>
           </div>`).join('')}
           <div class="cp-add">
             <input type="text" id="cp-input-${wi}-${bi}" placeholder="Add checkpoint..." onkeydown="if(event.key==='Enter')addCheckpoint(${wi},${bi},'${bf.name}','${wz.name}')"/>
@@ -1758,6 +2082,8 @@ function renderWarzones(){
 function toggleWarzone(i){state.warzones[i].collapsed=!state.warzones[i].collapsed;save();renderWarzones();}
 function toggleCheckpoints(id){const el=document.getElementById(id);if(el)el.classList.toggle('open');}
 function toggleCheckpoint(id){const cp=state.checkpoints.find(c=>c.id===id);if(cp){cp.done=!cp.done;save();renderWarzones();}}
+
+function styleCheckpointByName(name){ openCpStyleModal(name); }
 function addCheckpoint(wi,bi,bfName,wzName){
   const input=document.getElementById(`cp-input-${wi}-${bi}`);
   const name=input.value.trim(); if(!name) return;
@@ -1952,22 +2278,7 @@ function applyBulkReschedule(){
 }
 
 
-function buildColGrid(cols){
-  // Widths tuned to actual content sizes
-  const widths = {
-    name:'minmax(200px,2fr)',
-    type:'100px',
-    priority:'100px',
-    date:'100px',
-    gws:'55px',
-    battlefront:'minmax(120px,1fr)',
-    warzone:'minmax(100px,1fr)',
-    checkpoint:'minmax(100px,1fr)',
-    status:'75px',
-    actions:'minmax(160px,auto)'
-  };
-  return cols.map(col=>widths[col.key]||'1fr').join(' ');
-}
+
 
 function buildMasterRow(m, cols, rowClass, isSel){
   const typeColor=m.type==='One-Time'?'tag-red':m.type==='Daily'?'tag-blue':m.type==='Weekly'?'tag-amber':'tag-green';
@@ -1986,28 +2297,29 @@ function buildMasterRow(m, cols, rowClass, isSel){
             <div class="master-row-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${m.name}</div>
             ${nextOcc?`<span class="next-occurrence ${nextOcc.soon?'soon':''}" style="font-size:9px;padding:1px 5px;flex-shrink:0;">↻ ${nextOcc.text}</span>`:''}
           </div>
-          ${m.checkpoint?`<div style="font-size:10px;color:var(--tx2);">📍 ${m.checkpoint}</div>`:''}
+          ${m.checkpoint?`<div style="font-size:10px;">${renderCpTag(m.checkpoint)}</div>`:''}
         </div>
       </div>`;
       case 'type': return `<div style="display:flex;flex-direction:column;gap:3px;"><span class="tag ${typeColor}" style="font-size:10px;">${m.type}</span>${cdText?`<span class="countdown-badge ${cdText==='Due today'?'due-soon':''}">${cdText}</span>`:''}</div>`;
       case 'priority': return `<span class="tag ${prioColor}" style="font-size:10px;">${m.priority}</span>`;
-      case 'date': return `<span class="master-row-date">${m.date}</span>`;
-      case 'gws': return `<span style="font-family:var(--font-mono);font-size:10px;color:var(--tx2);">${m.gws}G</span>`;
+      case 'date': return `<span class="master-row-date" style="font-weight:600;">${m.date||'—'}</span>`;
+      case 'gws': return `<span style="font-family:var(--font-mono);font-size:10px;color:var(--tx2);">${m.gws||1}GWS</span>`;
       case 'battlefront': return `<span style="font-size:11px;color:var(--tx2);">${m.battlefront}</span>`;
       case 'warzone': return `<span class="tag ${col.wtag}" style="font-size:10px;">${m.warzone.split(' ')[0]}</span>`;
-      case 'checkpoint': return `<span style="font-size:11px;color:var(--tx2);">${m.checkpoint||'—'}</span>`;
+      case 'checkpoint': return m.checkpoint ? renderCpTag(m.checkpoint) : '<span style="color:var(--tx3);">—</span>';
       case 'status': return `<span style="font-size:11px;color:${m.status==='Done'?'var(--green)':'var(--tx2)'};">${m.status}</span>`;
       case 'actions': return `<div style="display:flex;gap:4px;align-items:center;flex-wrap:nowrap;">
         <button class="reschedule-btn" onclick="event.stopPropagation();askPush(${m.id})">↷ Reschedule</button>
-        <button class="icon-btn edit-btn" onclick="event.stopPropagation();openDetailModal(${m.id})">✎</button>
         <button class="icon-btn del-btn" onclick="event.stopPropagation();deleteMission(${m.id})">×</button>
       </div>`;
+      case 'order': return `<input type="number" min="1" class="order-input" value="${m.order||''}" placeholder="—" onclick="event.stopPropagation()" onchange="event.stopPropagation();saveMissionOrder(${m.id},this.value)">`;
       default: return '<span></span>';
     }
   }).join('');
 
+  const rowColor = m.color ? `border-left:3px solid ${m.color};padding-left:calc(0.875rem - 3px);` : '';
   return `<div class="${rowClass} ${isSel?'selected':''}" id="mrow-${m.id}"
-    style="display:grid;grid-template-columns:${grid};align-items:center;padding:0.55rem 0.875rem;border-bottom:1px solid var(--border);gap:0.75rem;transition:background 0.12s;cursor:pointer;min-width:0;"
+    style="display:grid;grid-template-columns:${grid};align-items:center;padding:0.55rem 0.875rem;border-bottom:1px solid var(--border);gap:0.75rem;transition:background 0.12s;cursor:pointer;min-width:0;${rowColor}"
     onclick="masterRowClick(${m.id},event)"
     oncontextmenu="openCtxMenu(event,${m.id},'master')"
     ontouchstart="startLongPress(event,${m.id},'master')"
@@ -2018,26 +2330,51 @@ function buildMasterRow(m, cols, rowClass, isSel){
 
 function buildColHeaderRow(cols){
   const grid = buildColGrid(cols);
-  const labels = cols.map(col=>`<span style="font-size:9px;text-transform:uppercase;letter-spacing:0.08em;color:var(--tx3);font-family:var(--font-mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${col.label}</span>`).join('');
-  return `<div style="display:grid;grid-template-columns:${grid};padding:0.4rem 0.875rem;gap:0.75rem;background:var(--bg1);">${labels}</div>`;
+  const cells = cols.map((col,i)=>`
+    <div class="col-header-cell" data-col-key="${col.key}">
+      ${col.label}
+      ${!col.locked ? `<div class="master-col-resize-handle" onmousedown="startColResize(event,'${col.key}')"></div>` : ''}
+    </div>`).join('');
+  return `<div style="display:grid;grid-template-columns:${grid};padding:0.4rem 0.875rem;gap:0.75rem;background:var(--bg1);">${cells}</div>`;
 }
 
 // Sort state — architecture ready for multi-level later
+// ── COLUMN WIDTH RESIZE ──
+let colWidths = JSON.parse(localStorage.getItem('gos_col_widths')||'{}');
+function saveColWidths(){ localStorage.setItem('gos_col_widths', JSON.stringify(colWidths)); }
+function buildColGrid(cols){
+  return cols.map(c=>{
+    const w = colWidths[c.key];
+    if(w) return w+'px';
+    if(c.locked && c.key==='actions') return '160px';
+    if(c.locked) return 'minmax(160px,1fr)';
+    return 'minmax(80px,1fr)';
+  }).join(' ');
+}
+
 let masterSort = JSON.parse(sessionStorage.getItem('gos_sort')||'{"field":"date","dir":"asc"}');
 
 function applyMasterSort(missions){
   const {field, dir} = masterSort;
   const PRIO_ORDER = {Critical:0, High:1, Normal:2, Medium:3, Low:4};
+  const GWS_TIME = {'08:00':1,'10:00':2,'14:00':3,'15:00':4};
+  function timeScore(m){ return GWS_TIME[m.time]||99; }
   return [...missions].sort((a,b)=>{
-    let av = a[field]||'', bv = b[field]||'';
-    if(field==='priority'){ av=PRIO_ORDER[a.priority]??9; bv=PRIO_ORDER[b.priority]??9; }
-    if(field==='gws'){ av=parseInt(a.gws)||0; bv=parseInt(b.gws)||0; }
     // Blank dates always sort to end regardless of direction
     if(field==='date'){
       if(!a.date && !b.date) return 0;
       if(!a.date) return 1;
       if(!b.date) return -1;
+      if(a.date !== b.date) return dir==='desc' ? (a.date<b.date?1:-1) : (a.date<b.date?-1:1);
+      // Same date: sort by time, then gws
+      const tCmp = timeScore(a) - timeScore(b);
+      if(tCmp!==0) return tCmp;
+      return (parseInt(a.gws)||1) - (parseInt(b.gws)||1);
     }
+    let av = a[field]||'', bv = b[field]||'';
+    if(field==='priority'){ av=PRIO_ORDER[a.priority]??9; bv=PRIO_ORDER[b.priority]??9; }
+    if(field==='gws'){ av=parseInt(a.gws)||0; bv=parseInt(b.gws)||0; }
+    if(field==='order'){ av=parseInt(a.order)||9999; bv=parseInt(b.order)||9999; }
     let cmp = typeof av==='number' ? av-bv : String(av).localeCompare(String(bv));
     return dir==='desc' ? -cmp : cmp;
   });
@@ -2077,7 +2414,9 @@ function renderMaster(){
   const q=(document.getElementById('master-search').value||'').toLowerCase();
   let missions=state.missions.filter(m=>{
     if(masterWzFilter!=='all'&&m.warzone!==masterWzFilter) return false;
+    if(masterWzFilterSet&&masterWzFilterSet.size>0&&!masterWzFilterSet.has(m.warzone)) return false;
     if(masterBfFilter.size>0&&!masterBfFilter.has(m.battlefront)) return false;
+    if(masterCpFilter&&masterCpFilter.size>0&&!masterCpFilter.has(m.checkpoint)) return false;
     if(q&&!m.name.toLowerCase().includes(q)&&!m.battlefront.toLowerCase().includes(q)) return false;
     return true;
   });
@@ -2111,7 +2450,7 @@ function renderMaster(){
     container.innerHTML=
       buildUnscheduledSection(unscheduled)+
       (sorted.length ? (
-        `<div class="master-sticky-header" style="border:1px solid var(--border);border-bottom:2px solid var(--border2);">${buildColHeaderRow(cols)}</div>` +
+        `<div class="master-flat-sticky-wrap"><div class="master-sticky-header" style="border:1px solid var(--border);border-bottom:2px solid var(--border2);">${buildColHeaderRow(cols)}</div></div>` +
         `<div style="background:var(--bg0);border:1px solid var(--border);border-top:none;border-radius:0 0 var(--radius-lg) var(--radius-lg);">
           ${sorted.map(m=>buildMasterRow(m,cols,'master-flat-row',selectedMissions.has(m.id))).join('')}
         </div>`) : '');
@@ -2180,6 +2519,12 @@ function openNewMissionModal(prefillBattlefront, prefillWarzone){
   document.getElementById('dr-date').value = localDateStr(tomorrow);
   document.getElementById('dr-gws').value = '1';
   document.getElementById('detail-overlay').classList.add('open');
+}
+function saveMissionOrder(id, val){
+  const m = state.missions.find(x=>x.id===id);
+  if(!m) return;
+  m.order = val ? parseInt(val) : null;
+  save();
 }
 function closeMissionModal(){document.getElementById('mission-modal').classList.remove('open');editingMissionId=null;}
 function deleteMissionFromModal(){
@@ -2258,68 +2603,11 @@ function toggleDetailRescheduleCard(){
 }
 
 function applyDetailReschedule(){
+  // Delegate to main reschedule modal so cascade logic is unified
   if(detailMissionId === null) return;
-  const m = state.missions.find(x => x.id === detailMissionId);
-  if(!m) return;
-  const targetDate = document.getElementById('dr-date').value;
-  const targetSlot = parseInt(document.getElementById('dr-gws').value);
-  if(!targetDate){ alert('Please select a date.'); return; }
-
-  const origDate = m.date;
-  const origSlot = getGwsSlot(m.time||autoAssignTime(m)) || 1;
-  const origScore = slotToMinutes(origDate, origSlot);
-  const targetScore = slotToMinutes(targetDate, targetSlot);
-  const slotDelta = targetScore - origScore;
-
-  const cascadeRadio = document.querySelector('input[name="dr-cascade"]:checked');
-  const doCascade = cascadeRadio && cascadeRadio.value === 'yes';
-
-  const toShift = doCascade ? state.missions.filter(x => {
-    if(x.id === detailMissionId || x.status === 'Done') return false;
-    if(x.type === 'Weekly' || x.type === 'Monthly' || x.type === 'Daily') return false;
-    const xSlot = getGwsSlot(x.time||autoAssignTime(x)) || 1;
-    return slotToMinutes(x.date, xSlot) > origScore;
-  }) : [];
-
-  // Check for GWS#4 hits
-  const gws4hits = [];
-  const changes = toShift.map(x => {
-    const xSlot = getGwsSlot(x.time||autoAssignTime(x)) || 1;
-    let newScore = slotToMinutes(x.date, xSlot) + slotDelta;
-    let newDay = Math.floor(newScore / 10);
-    let newSlot = Math.round(newScore % 10);
-    if(newSlot < 1){ newDay--; newSlot = 4; }
-    if(newSlot > 4){ newDay++; newSlot = 1; }
-    newSlot = Math.max(1, Math.min(4, newSlot));
-    const newDate = localDateStr(new Date(newDay * 86400000));
-    if(newSlot === 4) gws4hits.push(x.name);
-    return {mission:x, newSlot, newDate};
-  });
-
-  if(gws4hits.length){
-    document.getElementById('dr-gws4-warn').style.display = 'block';
-  }
-
-  const affected = changes.length;
-  const confirmMsg = affected > 0
-    ? `Move "${m.name}" to ${targetDate} GWS#${targetSlot}?
-
-${affected} task(s) will also shift.${gws4hits.length?' '+gws4hits.length+' will land on GWS#4 (reserved slot) — review after.':''}`
-    : `Move "${m.name}" to ${targetDate} GWS#${targetSlot}?`;
-
-  if(!confirm(confirmMsg)) return;
-  saveUndo();
-  m.date = targetDate;
-  m.time = gwsStartTime(targetSlot);
-  m.status = 'To Do';
-  changes.forEach(ch => {
-    ch.mission.date = ch.newDate;
-    ch.mission.time = gwsStartTime(ch.newSlot);
-  });
-
-  save();
+  const id = detailMissionId;
   closeDetailModal();
-  renderDaily(); renderCalendar(); renderMaster();
+  askPush(id);
 }
 
 function closeDetailModal(){
@@ -2376,10 +2664,12 @@ function deleteFromDetail(){
 
 // ── CALENDAR ──
 function renderCalendar(){
-  const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
   document.getElementById('cal-headers').innerHTML=days.map(d=>`<div class="cal-day-hd">${d}</div>`).join('');
   document.getElementById('cal-month-label').textContent=new Date(calYear,calMonth).toLocaleDateString('en-US',{month:'long',year:'numeric'});
-  const firstDay=new Date(calYear,calMonth,1).getDay();
+  // Week starts Monday: getDay() returns 0=Sun..6=Sat, we want 0=Mon..6=Sun
+  const rawFirst=new Date(calYear,calMonth,1).getDay();
+  const firstDay=(rawFirst+6)%7; // Mon=0, Tue=1, ... Sun=6
   const daysInMonth=new Date(calYear,calMonth+1,0).getDate();
   const daysInPrev=new Date(calYear,calMonth,0).getDate();
   let cells=[];
@@ -3133,46 +3423,61 @@ function clearH48Slot(i){
 
 
 
-// ── BATTLEFRONT FILTER ──
-let masterBfFilter = new Set(); // empty = show all
+// ── MULTI-FILTER (Warzone + Battlefront + Checkpoint) ──
+let masterBfFilter = new Set();
+let masterWzFilterSet = new Set();
+let masterCpFilter = new Set();
 
 function toggleBfFilterPanel(){
   const panel = document.getElementById('bf-filter-panel');
-  const isOpen = panel.classList.contains('open');
-  // Close on second click
-  if(isOpen){ panel.classList.remove('open'); return; }
-  // Populate options from all unique battlefronts
+  if(panel.classList.contains('open')){ panel.classList.remove('open'); return; }
+  // Populate all three sections
+  const wzs = [...new Set(state.missions.map(m=>m.warzone).filter(Boolean))].sort();
   const bfs = [...new Set(state.missions.map(m=>m.battlefront).filter(Boolean))].sort();
+  const cps = [...new Set(state.missions.map(m=>m.checkpoint).filter(Boolean))].sort();
+  document.getElementById('wz-filter-options').innerHTML = wzs.map(wz=>`
+    <label class="bf-filter-option">
+      <input type="checkbox" ${masterWzFilterSet.has(wz)?'checked':''} onchange="toggleWzOption('${wz.replace(/'/g,"\'")}',this.checked)">
+      <span>${wz}</span>
+    </label>`).join('');
   document.getElementById('bf-filter-options').innerHTML = bfs.map(bf=>`
     <label class="bf-filter-option">
       <input type="checkbox" ${masterBfFilter.has(bf)?'checked':''} onchange="toggleBfOption('${bf.replace(/'/g,"\'")}',this.checked)">
       <span>${bf}</span>
     </label>`).join('');
+  document.getElementById('cp-filter-options').innerHTML = cps.length ? cps.map(cp=>`
+    <label class="bf-filter-option">
+      <input type="checkbox" ${masterCpFilter.has(cp)?'checked':''} onchange="toggleCpOption('${cp.replace(/'/g,"\'")}',this.checked)">
+      <span>${cp}</span>
+    </label>`).join('') : '<span style="font-size:11px;color:var(--tx3);padding:4px 8px;display:block;">No checkpoints yet</span>';
   panel.classList.add('open');
 }
 
-function toggleBfOption(bf, checked){
-  if(checked) masterBfFilter.add(bf);
-  else masterBfFilter.delete(bf);
-  // Update filter button style
+function toggleWzOption(wz,checked){
+  if(checked) masterWzFilterSet.add(wz); else masterWzFilterSet.delete(wz);
+  updateFilterBtn(); renderMaster();
+}
+function toggleBfOption(bf,checked){
+  if(checked) masterBfFilter.add(bf); else masterBfFilter.delete(bf);
+  updateFilterBtn(); renderMaster();
+}
+function toggleCpOption(cp,checked){
+  if(checked) masterCpFilter.add(cp); else masterCpFilter.delete(cp);
+  updateFilterBtn(); renderMaster();
+}
+function updateFilterBtn(){
+  const total = masterWzFilterSet.size + masterBfFilter.size + masterCpFilter.size;
   const btn = document.getElementById('bf-filter-btn');
-  if(masterBfFilter.size > 0){
-    btn.textContent = '⊟ Filter ('+masterBfFilter.size+')';
-    btn.classList.add('bf-filter-btn-active');
-  } else {
-    btn.textContent = '⊟ Filter';
-    btn.classList.remove('bf-filter-btn-active');
-  }
+  btn.textContent = total>0 ? '⊟ Filter ('+total+')' : '⊟ Filter';
+  btn.classList.toggle('bf-filter-btn-active', total>0);
+}
+function clearAllFilters(){
+  masterBfFilter.clear(); masterWzFilterSet.clear(); masterCpFilter.clear();
+  updateFilterBtn();
+  document.querySelectorAll('#bf-filter-panel input[type=checkbox]').forEach(cb=>cb.checked=false);
   renderMaster();
 }
-
-function clearBfFilter(){
-  masterBfFilter.clear();
-  document.getElementById('bf-filter-btn').textContent = '⊟ Filter';
-  document.getElementById('bf-filter-btn').classList.remove('bf-filter-btn-active');
-  document.querySelectorAll('#bf-filter-options input[type=checkbox]').forEach(cb=>cb.checked=false);
-  renderMaster();
-}
+function clearBfFilter(){ clearAllFilters(); } // alias
 
 // Close filter panel when clicking outside
 document.addEventListener('click', function(e){
@@ -3284,11 +3589,21 @@ document.addEventListener('keydown', function(e){
   if(e.ctrlKey && e.shiftKey && e.key === 'Z'){
     e.preventDefault(); redo();
   }
-  // Escape exits select mode
+  // Escape exits select mode AND closes detail modal
   if(e.key === 'Escape'){
     if(masterSelectMode){ masterSelectMode=false; selectedMissions.clear(); updateBulkBar(); renderMaster(); }
     if(dailySelectMode){ cancelDailySelect(); }
     closeCtxMenu();
+    const detailOpen = document.getElementById('detail-overlay').classList.contains('open');
+    if(detailOpen) closeDetailModal();
+  }
+  // Enter saves detail modal (only from single-line inputs, not textarea)
+  if(e.key === 'Enter'){
+    const detailOpen = document.getElementById('detail-overlay').classList.contains('open');
+    if(detailOpen && e.target.tagName === 'INPUT' && e.target.type !== 'checkbox'){
+      e.preventDefault();
+      saveDetailModal();
+    }
   }
 });
 
@@ -3370,6 +3685,17 @@ function ctxAction(action){
   }
 }
 
+function ctxSetColor(color){
+  const id = ctxTargetId;
+  closeCtxMenu();
+  if(!id) return;
+  const m = state.missions.find(x=>x.id===id);
+  if(!m) return;
+  saveUndo();
+  m.color = color;
+  save(); renderDaily(); renderMaster();
+}
+
 // Close context menu on outside click or scroll
 document.addEventListener('click', function(e){
   if(!e.target.closest('#ctx-menu') && !e.target.closest('.ctx-menu')) closeCtxMenu();
@@ -3397,29 +3723,65 @@ const COL_DEFS = [
   {key:'type',     label:'Type',       locked:false, defaultOn:true},
   {key:'priority', label:'Priority',   locked:false, defaultOn:true},
   {key:'date',     label:'Date',       locked:false, defaultOn:true},
-  {key:'gws',      label:'GWS',        locked:false, defaultOn:true},
+  {key:'gws',      label:'Duration',  locked:false, defaultOn:true},
   {key:'battlefront',label:'Battlefront',locked:false,defaultOn:false},
   {key:'warzone',  label:'Warzone',    locked:false, defaultOn:false},
   {key:'checkpoint',label:'Checkpoint',locked:false, defaultOn:false},
   {key:'status',   label:'Status',     locked:false, defaultOn:false},
+  {key:'order',    label:'Order',      locked:false, defaultOn:false},
   {key:'actions',  label:'Actions',    locked:true,  defaultOn:true},
 ];
 
 function getColPrefs(){
-  if(!sessionStorage.getItem('gos_cols')){
+  const raw = localStorage.getItem('gos_cols');
+  if(!raw){
     const prefs = COL_DEFS.map(d=>({key:d.key,on:d.defaultOn}));
-    sessionStorage.setItem('gos_cols', JSON.stringify(prefs));
+    localStorage.setItem('gos_cols', JSON.stringify(prefs));
+    return prefs;
   }
-  return JSON.parse(sessionStorage.getItem('gos_cols'));
+  // Merge: add any new keys from COL_DEFS not in saved prefs
+  const saved = JSON.parse(raw);
+  const savedKeys = saved.map(p=>p.key);
+  COL_DEFS.forEach(d=>{ if(!savedKeys.includes(d.key)) saved.push({key:d.key,on:d.defaultOn}); });
+  return saved;
 }
 
 function saveColPrefs(prefs){
-  sessionStorage.setItem('gos_cols', JSON.stringify(prefs));
+  localStorage.setItem('gos_cols', JSON.stringify(prefs));
 }
 
 function getActiveCols(){
   const prefs = getColPrefs();
   return prefs.filter(p=>p.on).map(p=>COL_DEFS.find(d=>d.key===p.key)).filter(Boolean);
+}
+
+let _resizeKey=null, _resizeStartX=0, _resizeStartW=0;
+function startColResize(e, key){
+  e.preventDefault(); e.stopPropagation();
+  _resizeKey = key;
+  _resizeStartX = e.clientX;
+  // Find current rendered width
+  const header = document.querySelector(`.col-header-cell[data-col-key="${key}"]`);
+  _resizeStartW = header ? header.offsetWidth : (colWidths[key]||120);
+  document.body.style.cursor='col-resize';
+  document.body.style.userSelect='none';
+  document.addEventListener('mousemove', _onColResize);
+  document.addEventListener('mouseup', _stopColResize);
+}
+function _onColResize(e){
+  if(!_resizeKey) return;
+  const delta = e.clientX - _resizeStartX;
+  const newW = Math.max(60, _resizeStartW + delta);
+  colWidths[_resizeKey] = Math.round(newW);
+  saveColWidths();
+  renderMaster();
+}
+function _stopColResize(){
+  _resizeKey=null;
+  document.body.style.cursor='';
+  document.body.style.userSelect='';
+  document.removeEventListener('mousemove', _onColResize);
+  document.removeEventListener('mouseup', _stopColResize);
 }
 
 function toggleColPanel(){
@@ -3603,7 +3965,7 @@ setInterval(()=>{
         </div>
       </div>
       <div class="detail-field">
-        <span class="detail-field-label">GWS</span>
+        <span class="detail-field-label">Duration</span>
         <select id="detail-gws-select" class="detail-field-value">
           <option value="1">1 GWS — 1.5h</option>
           <option value="2">2 GWS — 3h</option>
@@ -3669,6 +4031,20 @@ setInterval(()=>{
   <div class="ctx-sep"></div>
   <div class="ctx-item" id="ctx-status" onclick="ctxAction('status')"><span class="ctx-icon">✓</span> Mark Done</div>
   <div class="ctx-item" onclick="ctxAction('reschedule')"><span class="ctx-icon">↷</span> Reschedule</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item ctx-color-item">
+    <span class="ctx-icon">🎨</span> Task Color
+    <div class="ctx-color-palette" id="ctx-color-palette">
+      <div class="ctx-color-swatch" style="background:#4285F4" onclick="ctxSetColor('#4285F4')" title="Blue"></div>
+      <div class="ctx-color-swatch" style="background:#0F9D58" onclick="ctxSetColor('#0F9D58')" title="Green"></div>
+      <div class="ctx-color-swatch" style="background:#DB4437" onclick="ctxSetColor('#DB4437')" title="Red"></div>
+      <div class="ctx-color-swatch" style="background:#F4B400" onclick="ctxSetColor('#F4B400')" title="Yellow"></div>
+      <div class="ctx-color-swatch" style="background:#9C27B0" onclick="ctxSetColor('#9C27B0')" title="Purple"></div>
+      <div class="ctx-color-swatch" style="background:#FF6D00" onclick="ctxSetColor('#FF6D00')" title="Orange"></div>
+      <div class="ctx-color-swatch" style="background:#00BCD4" onclick="ctxSetColor('#00BCD4')" title="Cyan"></div>
+      <div class="ctx-color-swatch ctx-color-clear" onclick="ctxSetColor(null)" title="Clear">✕</div>
+    </div>
+  </div>
   <div class="ctx-sep"></div>
   <div class="ctx-item danger" onclick="ctxAction('delete')"><span class="ctx-icon">×</span> Delete</div>
 </div>
@@ -3805,6 +4181,46 @@ setInterval(()=>{
     <div class="picker-body">
       <input type="text" class="picker-search" id="picker-search" placeholder="Search missions..." oninput="renderPickerList(this.value)">
       <div id="picker-list"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- CHECKPOINT STYLE MODAL -->
+<div class="detail-overlay" id="cp-style-modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="detail-modal" style="max-width:340px;">
+    <div class="detail-header">
+      <span class="detail-title-input" style="cursor:default;">🎨 Style Checkpoint</span>
+      <button class="panel-close" onclick="document.getElementById('cp-style-modal').classList.remove('open')">✕</button>
+    </div>
+    <div class="detail-body">
+      <div style="font-size:13px;font-weight:600;color:var(--tx0);margin-bottom:1rem;" id="cp-style-name"></div>
+      <div class="detail-field" style="margin-bottom:0.75rem;">
+        <span class="detail-field-label">Text Color</span>
+        <input type="color" id="cp-style-color" style="width:48px;height:28px;border:1px solid var(--border2);border-radius:4px;cursor:pointer;padding:2px;">
+      </div>
+      <div class="detail-field" style="margin-bottom:0.75rem;">
+        <span class="detail-field-label">Highlight</span>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input type="checkbox" id="cp-style-use-bg" style="cursor:pointer;">
+          <label for="cp-style-use-bg" style="font-size:12px;color:var(--tx1);cursor:pointer;">Enable highlight</label>
+          <input type="color" id="cp-style-bg" style="width:48px;height:28px;border:1px solid var(--border2);border-radius:4px;cursor:pointer;padding:2px;">
+        </div>
+      </div>
+      <div class="detail-field" style="margin-bottom:1.25rem;">
+        <span class="detail-field-label">Bold</span>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input type="checkbox" id="cp-style-bold" style="cursor:pointer;">
+          <label for="cp-style-bold" style="font-size:12px;color:var(--tx1);cursor:pointer;">Bold text</label>
+        </div>
+      </div>
+    </div>
+    <div class="detail-footer" style="display:flex;gap:8px;justify-content:space-between;">
+      <button class="btn" onclick="clearCpStyle()">Clear Style</button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn" onclick="document.getElementById('cp-style-modal').classList.remove('open')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveCpStyle()">Save</button>
+      </div>
     </div>
   </div>
 </div>
