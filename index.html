@@ -1181,7 +1181,9 @@ Watch PUC,Self-Improvement,Mindset & Habits,Daily,High,2026-04-07,12:00,1,,25 mi
 <script>
 const TODAY = new Date(); TODAY.setHours(0,0,0,0);
 const TODAYSTR = TODAY.getFullYear()+'-'+String(TODAY.getMonth()+1).padStart(2,'0')+'-'+String(TODAY.getDate()).padStart(2,'0');
-let calYear = TODAY.getFullYear(), calMonth = TODAY.getMonth();
+const _calSaved = JSON.parse(sessionStorage.getItem('gos_cal')||'null');
+let calYear = _calSaved ? _calSaved.y : TODAY.getFullYear();
+let calMonth = _calSaved ? _calSaved.m : TODAY.getMonth();
 let wzView = 'list';
 let masterWzFilter = 'all';
 let masterViewMode = 'grouped';
@@ -2705,6 +2707,7 @@ function changeMonth(dir){
   calMonth+=dir;
   if(calMonth>11){calMonth=0;calYear++;}
   if(calMonth<0){calMonth=11;calYear--;}
+  sessionStorage.setItem('gos_cal',JSON.stringify({y:calYear,m:calMonth}));
   renderCalendar();
 }
 
