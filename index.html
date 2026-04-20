@@ -1374,22 +1374,26 @@ function processRepeatingMissions(){
   // This ensures imports with old lastProcessedDate still show today's tasks
 
   const templates = state.missions.filter(m => m.templateId);
-  templates.forEach(tmpl => {
-    if(tmpl.type === 'Daily'){
-      // Always ensure template itself is on today's date
-      if(tmpl.date !== TODAYSTR){
-        tmpl.date = TODAYSTR;
-        tmpl.status = 'To Do';
+  // Only reset Daily missions to today if we haven't already processed today.
+  // This prevents overwriting manual reschedules made by the user.
+  if(lastRun !== TODAYSTR){
+    templates.forEach(tmpl => {
+      if(tmpl.type === 'Daily'){
+        // First run of the day: roll forward to today
+        if(tmpl.date !== TODAYSTR){
+          tmpl.date = TODAYSTR;
+          tmpl.status = 'To Do';
+        }
+        // Remove duplicate daily instances from previous days (keep today's only)
+        const duplicates = state.missions.filter(m =>
+          m.templateId === tmpl.templateId && m.date !== TODAYSTR && m.id !== tmpl.id
+        );
+        duplicates.forEach(d => {
+          state.missions = state.missions.filter(m => m.id !== d.id);
+        });
       }
-      // Remove any duplicate daily instances from previous days (keep today's only)
-      const duplicates = state.missions.filter(m =>
-        m.templateId === tmpl.templateId && m.date !== TODAYSTR && m.id !== tmpl.id
-      );
-      duplicates.forEach(d => {
-        state.missions = state.missions.filter(m => m.id !== d.id);
-      });
-    }
-  });
+    });
+  }
 
 
 
