@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>G Operating System</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23111110'/%3E%3Cpath d='M50 8 C50 8 62 38 92 50 C62 62 50 92 50 92 C50 92 38 62 8 50 C38 38 50 8 50 8Z' fill='white'/%3E%3C/svg%3E">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap');
@@ -762,6 +763,7 @@ body.light-forced .theme-toggle-knob{left:16px;background:var(--amber);}
     </div>
     <div class="topbar-right">
       <button id="topbar-board-toggle" class="topbar-action-btn" onclick="toggleBoardList()" style="display:none">📋 Board</button>
+      <span id="sync-badge" style="font-size:10px;color:var(--tx2);font-family:var(--font-mono);opacity:0;transition:opacity 0.5s;padding:2px 6px;"></span>
       <span class="streak-badge" id="streak-display" onclick="updateStreak()" title="Click to update">🔥 Day 1</span>
       <span class="date-badge" id="date-display"></span>
     </div>
@@ -1156,7 +1158,65 @@ if(!state.oodaEntries) state.oodaEntries=[];
 if(!state.visionTargets) state.visionTargets=[];
 if(state.visionQuote===undefined) state.visionQuote=DEFAULT_STATE.visionQuote;
 
-function save(){localStorage.setItem('gos_v4',JSON.stringify(state));}
+// ── SUPABASE CONFIG ──
+const SUPA_URL = 'https://eygmhuareggulpkadfxg.supabase.co';
+const SUPA_KEY = 'sb_publishable_vLaNpSZo9Pa750yU7uvlNQ_pvVfEsdr';
+const supa = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+let _syncTimeout = null;
+let _syncIndicator = null;
+
+
+
+async function _pushToSupabase(){
+  try{
+    const payload = { id:'main', state: state, updated_at: new Date().toISOString() };
+    const { error } = await supa.from('gos_state').upsert(payload, {onConflict:'id'});
+    if(error) console.warn('Supabase push error:', error.message);
+    else _showSyncBadge('✓ Synced');
+  } catch(e){ console.warn('Supabase push failed:', e); }
+}
+
+async function _pullFromSupabase(){
+  try{
+    _showSyncBadge('⟳ Syncing...');
+    const { data, error } = await supa.from('gos_state').select('state,updated_at').eq('id','main').single();
+    if(error || !data || !data.state) { _showSyncBadge(''); return false; }
+    // Compare timestamps — use remote if newer than local
+    const remoteTime = new Date(data.updated_at).getTime();
+    const localTime = parseInt(localStorage.getItem('gos_v4_ts')||'0');
+    if(remoteTime > localTime){
+      state = data.state;
+      // Run migrations on pulled state
+      if(!state.visionGoals) state.visionGoals=[];
+      if(!state.visionRemember) state.visionRemember=[];
+      if(!state.oodaEntries) state.oodaEntries=[];
+      if(!state.visionTargets) state.visionTargets=[];
+      if(!state.cpStyles) state.cpStyles={};
+      if(!state.h48Missions) state.h48Missions=[null,null,null];
+      localStorage.setItem('gos_v4', JSON.stringify(state));
+      localStorage.setItem('gos_v4_ts', remoteTime.toString());
+      _showSyncBadge('✓ Loaded from cloud');
+      return true;
+    }
+    _showSyncBadge('✓ Synced');
+    return false;
+  } catch(e){ console.warn('Supabase pull failed:', e); _showSyncBadge(''); return false; }
+}
+
+function _showSyncBadge(msg){
+  let badge = document.getElementById('sync-badge');
+  if(!badge) return;
+  badge.textContent = msg;
+  badge.style.opacity = msg ? '1' : '0';
+}
+
+function save(){
+  localStorage.setItem('gos_v4', JSON.stringify(state));
+  localStorage.setItem('gos_v4_ts', Date.now().toString());
+  clearTimeout(_syncTimeout);
+  _syncTimeout = setTimeout(_pushToSupabase, 1500);
+}
 function getColors(wz){
   if(wz==='Money Making') return {fill:'bf-fill-red',badge:'wz-badge-red',wtag:'tag-red'};
   if(wz==='Self-Improvement') return {fill:'bf-fill-blue',badge:'wz-badge-blue',wtag:'tag-blue'};
@@ -3604,24 +3664,39 @@ function updateGwsQBtns(){
   }
 })();
 // ── INIT ──
-document.getElementById('date-display').textContent=TODAY.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
-document.getElementById('streak-display').textContent='🔥 Day '+state.streak;
-if(!state.h48Missions) state.h48Missions=[null,null,null];
-if(!state.theme) state.theme='auto';
-if(!state.visionSectionOrder) state.visionSectionOrder=['h48','vision','quote','remember','targets'];
-processRepeatingMissions();
-applySettings();
-applyTheme();
-restoreNavOrder();
-// Restore last active view across refresh
-const _savedView = sessionStorage.getItem('gos_view');
-if(_savedView && document.getElementById('view-'+_savedView)){
-  switchView(_savedView);
-} else {
-  renderDaily();
+function _initApp(){
+  document.getElementById('date-display').textContent=TODAY.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  document.getElementById('streak-display').textContent='🔥 Day '+state.streak;
+  if(!state.h48Missions) state.h48Missions=[null,null,null];
+  if(!state.theme) state.theme='auto';
+  if(!state.visionSectionOrder) state.visionSectionOrder=['h48','vision','quote','remember','targets'];
+  if(!state.cpStyles) state.cpStyles={};
+  processRepeatingMissions();
+  applySettings();
+  applyTheme();
+  restoreNavOrder();
+  const _savedView = sessionStorage.getItem('gos_view');
+  if(_savedView && document.getElementById('view-'+_savedView)){
+    switchView(_savedView);
+  } else {
+    renderDaily();
+  }
+  renderWarzones();
+  renderCalendar();
 }
-renderWarzones();
-renderCalendar();
+
+// Pull from Supabase first — if remote is newer, reload state then init
+// Falls back to localStorage instantly if offline or Supabase unreachable
+(async function(){
+  try{
+    const pulled = await Promise.race([
+      _pullFromSupabase(),
+      new Promise(res=>setTimeout(()=>res(false), 3000)) // 3s timeout fallback
+    ]);
+    // If we pulled new state, processRepeatingMissions will use fresh state
+  } catch(e){ console.warn('Init pull failed, using local state'); }
+  _initApp();
+})();
 
 // Live countdown timer — refresh daily checklist every 60s so next-occurrence badges stay accurate
 setInterval(()=>{
