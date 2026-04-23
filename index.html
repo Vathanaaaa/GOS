@@ -276,7 +276,7 @@ body{font-family:var(--font-body);background:var(--bg1);color:var(--tx0);min-hei
 .gallery-bar-fill{height:100%;border-radius:2px;}
 
 /* MASTER LIST VIEW */
-.master-topbar{display:flex;align-items:center;gap:10px;margin-bottom:1.25rem;flex-wrap:wrap;}
+.master-topbar{display:flex;align-items:center;gap:10px;margin-bottom:0;flex-wrap:wrap;position:sticky;top:53px;z-index:11;background:var(--bg1);padding:0.75rem 0;border-bottom:1px solid var(--border);}
 .master-filter-group{display:flex;gap:4px;}
 .filter-btn{padding:4px 10px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg0);font-size:11px;cursor:pointer;color:var(--tx2);transition:all 0.12s;font-family:var(--font-body);}
 .filter-btn.active{background:var(--tx0);color:var(--bg0);border-color:var(--tx0);}
@@ -308,7 +308,7 @@ body{font-family:var(--font-body);background:var(--bg1);color:var(--tx0);min-hei
 .cal-month{font-family:var(--font-head);font-size:15px;font-weight:600;}
 .cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;}
 .cal-day-hd{font-size:10px;color:var(--tx2);text-align:center;padding:4px 0;font-family:var(--font-mono);}
-.cal-day{background:var(--bg0);border:1px solid var(--border);border-radius:var(--radius);min-height:76px;padding:5px;cursor:pointer;transition:all 0.12s;overflow:hidden;min-width:0;}
+.cal-day{background:var(--bg0);border:1px solid var(--border);border-radius:var(--radius);min-height:90px;padding:5px;cursor:pointer;transition:all 0.12s;overflow:hidden;min-width:0;}
 .cal-day:hover{border-color:var(--border2);background:var(--bg1);}
 .cal-day.today{border-color:var(--blue);border-width:1.5px;}
 .cal-day.other-month{opacity:0.3;}
@@ -628,7 +628,7 @@ body.light-forced .theme-toggle-knob{left:16px;background:var(--amber);}
 
 /* BATTLEFRONT FILTER PANEL */
 .bf-filter-wrapper{position:relative;}
-.bf-filter-panel{display:none;position:absolute;top:calc(100% + 6px);left:0;background:var(--bg0);border:1px solid var(--border2);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);z-index:50;min-width:220px;padding:0.5rem 0;}
+.bf-filter-panel{display:none;position:absolute;top:calc(100% + 6px);left:0;background:var(--bg0);border:1px solid var(--border2);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);z-index:50;min-width:220px;padding:0.5rem 0;max-height:360px;overflow-y:auto;}
 .bf-filter-panel.open{display:block;}
 .bf-filter-panel-header{padding:0.4rem 0.75rem 0.25rem;font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:0.06em;font-family:var(--font-mono);display:flex;justify-content:space-between;align-items:center;}
 .bf-filter-panel-header button{font-size:10px;color:var(--tx3);background:none;border:none;cursor:pointer;font-family:var(--font-body);}
@@ -702,7 +702,7 @@ body.light-forced .theme-toggle-knob{left:16px;background:var(--amber);}
 /* ── MASTER LIST STICKY FLAT HEADER ── */
 #view-master.active { display:flex; flex-direction:column; }
 #view-daily.active { display:flex; flex-direction:column; }
-.master-flat-sticky-wrap { position:sticky; top:53px; z-index:10; background:var(--bg0); }
+.master-flat-sticky-wrap { position:sticky; top:103px; z-index:9; background:var(--bg0); }
 .master-col-resize-handle {
   position:absolute; right:0; top:0; bottom:0; width:5px;
   cursor:col-resize; z-index:2; background:transparent;
@@ -2400,7 +2400,7 @@ function buildMasterRow(m, cols, rowClass, isSel){
         <button class="reschedule-btn" onclick="event.stopPropagation();askPush(${m.id})">↷ Reschedule</button>
         <button class="icon-btn del-btn" onclick="event.stopPropagation();deleteMission(${m.id})">×</button>
       </div>`;
-      case 'order': return `<input type="number" min="1" class="order-input" value="${m.order||''}" placeholder="—" onclick="event.stopPropagation()" onchange="event.stopPropagation();saveMissionOrder(${m.id},this.value)">`;
+      case 'order': return `<input type="number" min="1" class="order-input" value="${m.order||''}" placeholder="—" onclick="event.stopPropagation()" onchange="event.stopPropagation();saveMissionOrder(${m.id},this.value)" onkeydown="event.stopPropagation();if(event.key==='Enter'){saveMissionOrder(${m.id},this.value);this.blur();}">`;
       default: return '<span></span>';
     }
   }).join('');
@@ -3816,7 +3816,7 @@ function cancelLongPress(){ clearTimeout(ctxLongPressTimer); }
 // COLUMN CUSTOMISER
 // ════════════════════════════════════════════
 const COL_DEFS = [
-  {key:'name',     label:'Mission',    locked:true,  defaultOn:true},
+  {key:'name',     label:'Mission',    locked:false, defaultOn:true},
   {key:'type',     label:'Type',       locked:false, defaultOn:true},
   {key:'priority', label:'Priority',   locked:false, defaultOn:true},
   {key:'date',     label:'Date',       locked:false, defaultOn:true},
@@ -3826,7 +3826,7 @@ const COL_DEFS = [
   {key:'checkpoint',label:'Checkpoint',locked:false, defaultOn:false},
   {key:'status',   label:'Status',     locked:false, defaultOn:false},
   {key:'order',    label:'Order',      locked:false, defaultOn:false},
-  {key:'actions',  label:'Actions',    locked:true,  defaultOn:true},
+  {key:'actions',  label:'Actions',    locked:false, defaultOn:true},
 ];
 
 function getColPrefs(){
