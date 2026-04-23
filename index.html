@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>G Operating System</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23111110'/%3E%3Cpath d='M50 8 C50 8 62 38 92 50 C62 62 50 92 50 92 C50 92 38 62 8 50 C38 38 50 8 50 8Z' fill='white'/%3E%3C/svg%3E">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap');
@@ -313,7 +314,9 @@ body{font-family:var(--font-body);background:var(--bg1);color:var(--tx0);min-hei
 .cal-day.other-month{opacity:0.3;}
 .cal-day-num{font-size:10px;font-weight:500;margin-bottom:3px;font-family:var(--font-mono);}
 .cal-today-num{color:var(--blue);}
-.cal-pill{font-size:8px;padding:1px 4px;border-radius:3px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cal-pill{font-size:8px;padding:2px 4px;border-radius:3px;margin-bottom:2px;overflow:hidden;}
+.cal-pill-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500;}
+.cal-pill-notes{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0.7;font-size:7px;margin-top:1px;}
 
 /* MODAL & SIDE PANEL */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:100;align-items:center;justify-content:center;}
@@ -422,7 +425,7 @@ body{font-family:var(--font-body);background:var(--bg1);color:var(--tx0);min-hei
 /* CALENDAR DAY MODAL */
 .cal-day-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:120;align-items:center;justify-content:center;}
 .cal-day-modal.open{display:flex;}
-.cal-day-modal-box{background:var(--bg0);border-radius:var(--radius-xl);border:1px solid var(--border);width:520px;max-width:94vw;max-height:86vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow-lg);}
+.cal-day-modal-box{background:var(--bg0);border-radius:var(--radius-xl);border:1px solid var(--border);width:660px;max-width:94vw;max-height:86vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow-lg);}
 .cal-day-modal-header{padding:1.125rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
 .cal-day-modal-title{font-family:var(--font-head);font-size:15px;font-weight:600;}
 .cal-day-modal-body{flex:1;overflow-y:auto;padding:1.125rem;}
@@ -826,6 +829,7 @@ body.light-forced .theme-toggle-knob{left:16px;background:var(--amber);}
   font-size:10px; display:flex; align-items:center; justify-content:center;
   border:1px solid var(--border2) !important;
 }
+.spill-card{opacity:0.7;border-style:dashed !important;}
 </style>
 </head>
 <body>
@@ -900,6 +904,7 @@ body.light-forced .theme-toggle-knob{left:16px;background:var(--amber);}
     </div>
     <div class="topbar-right">
       <button id="topbar-board-toggle" class="topbar-action-btn" onclick="toggleBoardList()" style="display:none">📋 Board</button>
+      <span id="sync-badge" style="font-size:10px;color:var(--tx2);font-family:var(--font-mono);opacity:0;transition:opacity 0.5s;padding:2px 6px;"></span>
       <span class="streak-badge" id="streak-display" onclick="updateStreak()" title="Click to update">🔥 Day 1</span>
       <span class="date-badge" id="date-display"></span>
     </div>
@@ -1307,7 +1312,58 @@ if(!state.oodaEntries) state.oodaEntries=[];
 if(!state.visionTargets) state.visionTargets=[];
 if(state.visionQuote===undefined) state.visionQuote=DEFAULT_STATE.visionQuote;
 
-function save(){localStorage.setItem('gos_v4',JSON.stringify(state));}
+// ── SUPABASE SYNC ──
+const SUPA_URL='https://eygmhuareggulpkadfxg.supabase.co';
+const SUPA_KEY='sb_publishable_vLaNpSZo9Pa750yU7uvlNQ_pvVfEsdr';
+const supa=supabase.createClient(SUPA_URL,SUPA_KEY);
+let _syncTimeout=null;
+
+function save(){
+  localStorage.setItem('gos_v4',JSON.stringify(state));
+  localStorage.setItem('gos_v4_ts',Date.now().toString());
+  clearTimeout(_syncTimeout);
+  _syncTimeout=setTimeout(_pushToSupabase,1500);
+}
+
+async function _pushToSupabase(){
+  try{
+    const {error}=await supa.from('gos_state').upsert({id:'main',state:state,updated_at:new Date().toISOString()},{onConflict:'id'});
+    if(error) console.warn('Supabase push error:',error.message);
+    else _showSyncBadge('✓ Synced');
+  }catch(e){console.warn('Supabase push failed:',e);}
+}
+
+async function _pullFromSupabase(){
+  try{
+    _showSyncBadge('⟳ Syncing...');
+    const {data,error}=await supa.from('gos_state').select('state,updated_at').eq('id','main').single();
+    if(error||!data||!data.state){_showSyncBadge('');return false;}
+    const remoteTime=new Date(data.updated_at).getTime();
+    const localTime=parseInt(localStorage.getItem('gos_v4_ts')||'0');
+    if(remoteTime>localTime){
+      state=data.state;
+      if(!state.visionGoals) state.visionGoals=[];
+      if(!state.visionRemember) state.visionRemember=[];
+      if(!state.oodaEntries) state.oodaEntries=[];
+      if(!state.visionTargets) state.visionTargets=[];
+      if(!state.cpStyles) state.cpStyles={};
+      if(!state.h48Missions) state.h48Missions=[null,null,null];
+      localStorage.setItem('gos_v4',JSON.stringify(state));
+      localStorage.setItem('gos_v4_ts',remoteTime.toString());
+      _showSyncBadge('✓ Loaded from cloud');
+      return true;
+    }
+    _showSyncBadge('✓ Synced');
+    return false;
+  }catch(e){console.warn('Supabase pull failed:',e);_showSyncBadge('');return false;}
+}
+
+function _showSyncBadge(msg){
+  const b=document.getElementById('sync-badge');
+  if(!b) return;
+  b.textContent=msg;
+  b.style.opacity=msg?'1':'0';
+}
 
 function getCpStyle(name){
   if(!name || !state.cpStyles || !state.cpStyles[name]) return null;
@@ -1372,22 +1428,17 @@ function processRepeatingMissions(){
   // This ensures imports with old lastProcessedDate still show today's tasks
 
   const templates = state.missions.filter(m => m.templateId);
-  templates.forEach(tmpl => {
-    if(tmpl.type === 'Daily'){
-      // Always ensure template itself is on today's date
-      if(tmpl.date !== TODAYSTR){
-        tmpl.date = TODAYSTR;
-        tmpl.status = 'To Do';
+  if(lastRun !== TODAYSTR){
+    templates.forEach(tmpl => {
+      if(tmpl.type === 'Daily'){
+        if(tmpl.date !== TODAYSTR){ tmpl.date = TODAYSTR; tmpl.status = 'To Do'; }
+        const duplicates = state.missions.filter(m =>
+          m.templateId === tmpl.templateId && m.date !== TODAYSTR && m.id !== tmpl.id
+        );
+        duplicates.forEach(d => { state.missions = state.missions.filter(m => m.id !== d.id); });
       }
-      // Remove any duplicate daily instances from previous days (keep today's only)
-      const duplicates = state.missions.filter(m =>
-        m.templateId === tmpl.templateId && m.date !== TODAYSTR && m.id !== tmpl.id
-      );
-      duplicates.forEach(d => {
-        state.missions = state.missions.filter(m => m.id !== d.id);
-      });
-    }
-  });
+    });
+  }
 
 
 
@@ -1533,20 +1584,30 @@ function renderDaily(){
     return h*60+(m||0);
   }
 
-  const sorted=[...allToday].sort((a,b)=>timeToMins(a.time||autoAssignTime(a))-timeToMins(b.time||autoAssignTime(b)));
+  const baseSort=[...allToday].sort((a,b)=>timeToMins(a.time||autoAssignTime(a))-timeToMins(b.time||autoAssignTime(b)));
+  // Expand 2-GWS missions into a second slot card
+  const GWS_NEXT={'08:00':'10:00','10:00':'13:00','13:00':'15:00'};
+  const expanded=[];
+  baseSort.forEach(m=>{
+    expanded.push({m,slotTime:m.time||autoAssignTime(m),isSpill:false});
+    if((parseInt(m.gws)||1)>=2){
+      const nextT=GWS_NEXT[m.time||autoAssignTime(m)];
+      if(nextT) expanded.push({m,slotTime:nextT,isSpill:true});
+    }
+  });
+  expanded.sort((a,b)=>timeToMins(a.slotTime)-timeToMins(b.slotTime));
   const container=document.getElementById('daily-list');
 
-  if(!sorted.length){
+  if(!expanded.length){
     container.innerHTML='<div class="empty-state">No missions scheduled for today.<br>Add a mission to get started.</div>';
   } else {
     let html='', lastTime='';
-    sorted.forEach(m=>{
-      const t=m.time||autoAssignTime(m);
-      if(t!==lastTime){
-        html+=`<div class="time-header"><span class="time-label">${formatTime(t)}</span><div class="time-divider"></div></div>`;
-        lastTime=t;
+    expanded.forEach(({m,slotTime,isSpill})=>{
+      if(slotTime!==lastTime){
+        html+=`<div class="time-header"><span class="time-label">${formatTime(slotTime)}</span><div class="time-divider"></div></div>`;
+        lastTime=slotTime;
       }
-      html+=buildMissionCard(m,false);
+      html+=buildMissionCard(m,false,isSpill);
     });
     container.innerHTML=html;
   }
@@ -1600,7 +1661,8 @@ function formatTime(t){
   return `${hh}:${String(m).padStart(2,'0')} ${ampm}`;
 }
 
-function buildMissionCard(m,isPushed){
+function buildMissionCard(m,isPushed,isSpill){
+  isSpill=isSpill||false;
   const isDone=m.status==='Done';
   const col=getColors(m.warzone);
   const t=m.time||autoAssignTime(m);
@@ -1610,7 +1672,7 @@ function buildMissionCard(m,isPushed){
   const nextOccHtml=nextOcc?`<span class="next-occurrence ${nextOcc.soon?'soon':''}" style="font-size:9px;padding:1px 5px;">↻ ${nextOcc.text}</span>`:'';
   const isDailySel = dailySelectedMissions.has(m.id);
   const colorStyle = m.color ? `border-left:3px solid ${m.color};` : '';
-  return `<div class="mission-card ${isDone?'done':''} ${isPushed?'pushed':''} ${isDailySel?'selected':''}" id="mc-${m.id}"
+  return `<div class="mission-card${isSpill?' spill-card':''} ${isDone?'done':''} ${isPushed?'pushed':''} ${isDailySel?'selected':''}" id="mc-${m.id}"
     style="${colorStyle}"
     oncontextmenu="openCtxMenu(event,${m.id},'daily')"
     ontouchstart="startLongPress(event,${m.id},'daily')"
@@ -1629,7 +1691,7 @@ function buildMissionCard(m,isPushed){
           ${cdText?`<span class="countdown-badge ${cdText==='Due today'?'due-soon':''}">${cdText}</span>`:''}
         </div>
       </div>
-      ${m.notes?`<div class="mission-notes">${m.notes}</div>`:''}
+      ${m.notes?`<div class="mission-notes" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;font-size:10px;color:var(--tx3);margin-top:1px;">${m.notes}</div>`:''}
     </div>
     <div class="mission-right">
       <span class="gws-badge">⏱${m.gws||1}G</span>
@@ -2074,12 +2136,29 @@ function renderWarzones(){
           <span class="collapse-icon">${wz.collapsed?'▸':'▾'}</span>
         </div>
       </div>
-      <div class="warzone-body ${wz.collapsed?'collapsed':''}">${bfRows}</div>
+      <div class="warzone-body ${wz.collapsed?'collapsed':''}">
+        ${bfRows}
+        <div style="padding:0.5rem 0.75rem;">
+          <div style="display:flex;gap:6px;align-items:center;">
+            <input type="text" id="bf-input-${wi}" placeholder="New battlefront name..." style="flex:1;padding:5px 8px;font-size:12px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--bg0);color:var(--tx0);font-family:var(--font-body);" onkeydown="if(event.key==='Enter')addBattlefront(${wi})">
+            <button class="btn" style="font-size:11px;padding:4px 10px;white-space:nowrap;" onclick="addBattlefront(${wi})">+ Battlefront</button>
+          </div>
+        </div>
+      </div>
     </div>`;
   }).join('');
 }
 
 function toggleWarzone(i){state.warzones[i].collapsed=!state.warzones[i].collapsed;save();renderWarzones();}
+function addBattlefront(wi){
+  const input=document.getElementById('bf-input-'+wi);
+  if(!input) return;
+  const name=input.value.trim();
+  if(!name) return;
+  if(state.warzones[wi].battlefronts.find(b=>b.name===name)){alert('Battlefront already exists.');return;}
+  state.warzones[wi].battlefronts.push({name,deadline:'',reward:'',goal:'',cover:''});
+  input.value=''; save(); renderWarzones();
+}
 function toggleCheckpoints(id){const el=document.getElementById(id);if(el)el.classList.toggle('open');}
 function toggleCheckpoint(id){const cp=state.checkpoints.find(c=>c.id===id);if(cp){cp.done=!cp.done;save();renderWarzones();}}
 
@@ -2221,6 +2300,7 @@ function updateBulkBar(){
 }
 function bulkDelete(){
   if(!confirm(`Delete ${selectedMissions.size} missions?`)) return;
+  saveUndo();
   state.missions=state.missions.filter(m=>!selectedMissions.has(m.id));
   selectedMissions.clear(); save(); renderMaster(); renderDaily(); renderCalendar();
 }
@@ -2297,7 +2377,7 @@ function buildMasterRow(m, cols, rowClass, isSel){
             <div class="master-row-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${m.name}</div>
             ${nextOcc?`<span class="next-occurrence ${nextOcc.soon?'soon':''}" style="font-size:9px;padding:1px 5px;flex-shrink:0;">↻ ${nextOcc.text}</span>`:''}
           </div>
-          ${m.checkpoint?`<div style="font-size:10px;">${renderCpTag(m.checkpoint)}</div>`:''}
+          ${m.notes?`<div style="font-size:10px;color:var(--tx3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:300px;margin-top:1px;">${m.notes}</div>`:''}
         </div>
       </div>`;
       case 'type': return `<div style="display:flex;flex-direction:column;gap:3px;"><span class="tag ${typeColor}" style="font-size:10px;">${m.type}</span>${cdText?`<span class="countdown-badge ${cdText==='Due today'?'due-soon':''}">${cdText}</span>`:''}</div>`;
@@ -2691,7 +2771,8 @@ function renderCalendar(){
     const pills=dayMs.slice(0,3).map(m=>{
       const bg=m.warzone==='Money Making'?'var(--red-bg)':m.warzone==='Self-Improvement'?'var(--blue-bg)':'var(--green-bg)';
       const tc=m.warzone==='Money Making'?'var(--red)':m.warzone==='Self-Improvement'?'var(--blue)':'var(--green)';
-      return `<div class="cal-pill" style="background:${bg};color:${tc};" title="${m.name}">${m.name}</div>`;
+      const notesHtml=m.notes?`<div class="cal-pill-notes">${m.notes}</div>`:'';
+      return `<div class="cal-pill" style="background:${bg};color:${tc};" title="${m.name}"><div class="cal-pill-name">${m.name}</div>${notesHtml}</div>`;
     }).join('');
     const more=dayMs.length>3?`<div style="font-size:8px;color:var(--tx3);">+${dayMs.length-3}</div>`:'';
     return `<div class="cal-day ${!cell.current?'other-month':''} ${isToday?'today':''}" onclick="${cell.current?`openCalDayModal('${ds}')`:''}" style="${cell.current?'cursor:pointer':''}">
@@ -3685,6 +3766,14 @@ function ctxAction(action){
     if(calDayModalDate && document.getElementById('cal-day-modal').classList.contains('open')) openCalDayModal(calDayModalDate);
   } else if(action === 'reschedule'){
     askPush(id);
+  } else if(action === 'duplicate'){
+    saveUndo();
+    const newId=state.missions.length?Math.max(...state.missions.map(x=>x.id))+1:1;
+    const dup=JSON.parse(JSON.stringify(m));
+    dup.id=newId; dup.name=m.name+' (copy)'; delete dup.templateId;
+    const idx=state.missions.findIndex(x=>x.id===id);
+    state.missions.splice(idx+1,0,dup);
+    save(); renderAll();
   } else if(action === 'delete'){
     saveUndo();
     if(!confirm('Delete "'+m.name+'"?')) return;
@@ -3890,24 +3979,27 @@ function updateGwsQBtns(){
   }
 })();
 // ── INIT ──
-document.getElementById('date-display').textContent=TODAY.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
-document.getElementById('streak-display').textContent='🔥 Day '+state.streak;
-if(!state.h48Missions) state.h48Missions=[null,null,null];
-if(!state.theme) state.theme='auto';
-if(!state.visionSectionOrder) state.visionSectionOrder=['h48','vision','quote','remember','targets'];
-processRepeatingMissions();
-applySettings();
-applyTheme();
-restoreNavOrder();
-// Restore last active view across refresh
-const _savedView = sessionStorage.getItem('gos_view');
-if(_savedView && document.getElementById('view-'+_savedView)){
-  switchView(_savedView);
-} else {
-  renderDaily();
+function _initApp(){
+  document.getElementById('date-display').textContent=TODAY.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  document.getElementById('streak-display').textContent='🔥 Day '+state.streak;
+  if(!state.h48Missions) state.h48Missions=[null,null,null];
+  if(!state.theme) state.theme='auto';
+  if(!state.visionSectionOrder) state.visionSectionOrder=['h48','vision','quote','remember','targets'];
+  if(!state.cpStyles) state.cpStyles={};
+  processRepeatingMissions();
+  applySettings();
+  applyTheme();
+  restoreNavOrder();
+  const _savedView=sessionStorage.getItem('gos_view');
+  if(_savedView && document.getElementById('view-'+_savedView)){ switchView(_savedView); } else { renderDaily(); }
+  renderWarzones();
+  renderCalendar();
 }
-renderWarzones();
-renderCalendar();
+(async function(){
+  try{ await Promise.race([_pullFromSupabase(), new Promise(r=>setTimeout(()=>r(false),3000))]); }
+  catch(e){ console.warn('Init pull failed, using local state'); }
+  _initApp();
+})();
 
 // Live countdown timer — refresh daily checklist every 60s so next-occurrence badges stay accurate
 setInterval(()=>{
@@ -4053,6 +4145,8 @@ setInterval(()=>{
       <div class="ctx-color-swatch ctx-color-clear" onclick="ctxSetColor(null)" title="Clear">✕</div>
     </div>
   </div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item" onclick="ctxAction('duplicate')"><span class="ctx-icon">⧉</span> Duplicate</div>
   <div class="ctx-sep"></div>
   <div class="ctx-item danger" onclick="ctxAction('delete')"><span class="ctx-icon">×</span> Delete</div>
 </div>
